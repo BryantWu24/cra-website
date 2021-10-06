@@ -15,11 +15,18 @@ import {
     List,
     SwipeableDrawer,
     ListItemIcon,
-    ListItemText
+    ListItemText,
+    TextField,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
 } from '@mui/material';
 import { mainListItems } from './ListItem'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import MenuIcon from '@mui/icons-material/Menu';
+import LoginIcon from '@mui/icons-material/Login';
 import Dashboard from '../Dashboard/Dashboard';
 import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
@@ -63,8 +70,13 @@ class Backend extends Component {
         this.state = {
             isDrawerOpen: false,
             currentPage: 'HOME',
-            userName: 'UserName'
+            userName: 'UserName',
+            isLogInDialogOpen: false,
+            isSignUpDialogOpen: false
         }
+
+        this.toggleLogInDialog = this.toggleLogInDialog.bind(this);
+        this.toggleSignUpDialog = this.toggleSignUpDialog.bind(this);
     }
     clickListItem = (page) => {
         this.setState({
@@ -72,7 +84,7 @@ class Backend extends Component {
         })
     }
 
-    renderSwitch() {
+    renderSwitch = () => {
         switch (this.state.currentPage) {
             case 'DASHBOARD':
                 return <Dashboard />
@@ -81,6 +93,40 @@ class Backend extends Component {
             default:
                 return <Home />;
         }
+    }
+
+    goSignUp = () => {
+        this.setState({
+            isSignUpDialogOpen: true,
+            isLogInDialogOpen: false
+        })
+    }
+
+    goLogIn = () => {
+        this.setState({
+            isSignUpDialogOpen: false,
+            isLogInDialogOpen: true
+        })
+    }
+
+    doLogIn = () => {
+        this.toggleLogInDialog(false);
+    }
+
+    doSingUp = () => {
+        this.toggleSignUpDialog(false);
+    }
+
+    toggleLogInDialog = (status) => {
+        this.setState({
+            isLogInDialogOpen: status
+        })
+    }
+
+    toggleSignUpDialog = (status) => {
+        this.setState({
+            isSignUpDialogOpen: status
+        })
     }
 
     render() {
@@ -119,7 +165,7 @@ class Backend extends Component {
         return (
             <div>
                 <Box sx={{ flexGrow: 1 }}>
-                    <AppBar position="static" style={{ background: '#272727' }} id="appBar">
+                    <AppBar position="static" style={{ background: '#272727' }} >
                         <Toolbar>
                             <IconButton
                                 size="large"
@@ -134,7 +180,7 @@ class Backend extends Component {
                             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                                 News
                             </Typography>
-                            <Button color="inherit">Login</Button>
+                            <Button color="inherit" onClick={() => { this.toggleLogInDialog(true) }}>LogIn / SignUp</Button>
                         </Toolbar>
                     </AppBar>
                 </Box>
@@ -163,13 +209,105 @@ class Backend extends Component {
                         </Container>
                     </main>
                 </div>
+                <Dialog open={this.state.isSignUpDialogOpen} disableEscapeKeyDown id="sign-up-dialog">
+                    <DialogTitle style={{ background: '#959595', color: 'white' }} >Sign Up</DialogTitle>
+                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                        <DialogContentText style={{ background: '#959595', color: 'white' }} >
+                            Welcome to Register.
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="User Name"
+                            type="text"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="phone"
+                            label="Phone"
+                            type="text"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="email"
+                            label="E-Mail"
+                            type="email"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="account"
+                            label="Account"
+                            type="text"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                        <TextField
+                            margin="dense"
+                            id="password"
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                    </DialogContent>
+                    <DialogActions style={{ background: '#959595' }} >
+                        <Button color="secondary" onClick={() => { this.toggleSignUpDialog(false) }} >Cancel</Button>
+                        <Button color="secondary" onClick={() => { this.goLogIn(false) }} >Go LogIn</Button>
+                        <Button color="secondary" onClick={() => { this.doSingUp(false) }}>Sign Up</Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog open={this.state.isLogInDialogOpen} disableEscapeKeyDown id="log-in-dialog">
+                    <DialogTitle style={{ background: '#959595', color: 'white' }} >Log In</DialogTitle>
+                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                        <DialogContentText style={{ background: '#959595', color: 'white' }} >
+                            Welcome to Log In.
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="account"
+                            label="Account"
+                            type="text"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                        <TextField
+                            margin="dense"
+                            id="password"
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                        />
+                    </DialogContent>
+                    <DialogActions style={{ background: '#959595' }} >
+                        <Button color="secondary" onClick={() => { this.toggleLogInDialog(false) }} >Cancel</Button>
+                        <Button color="secondary" onClick={() => { this.goSignUp() }} >Go SingUp</Button>
+                        <Button color="secondary" onClick={() => { this.doLogIn(false) }}>Log In</Button>
+                    </DialogActions>
+                </Dialog>
+
             </div>
         );
     }
 }
 
-
-
-
-export default withStyles(styles, { withTheme: true })(Backend)
+export default withStyles(styles)(Backend)
 
