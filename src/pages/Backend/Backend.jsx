@@ -1,22 +1,26 @@
 import React, { Component } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import { withStyles } from '@material-ui/styles';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+
+import {
+    Typography,
+    Button,
+    Avatar,
+    Container,
+    Box,
+    AppBar,
+    Toolbar,
+    IconButton,
+    ListItem,
+    Divider,
+    List,
+    SwipeableDrawer,
+    ListItemIcon,
+    ListItemText
+} from '@mui/material';
 import { mainListItems } from './ListItem'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import MenuIcon from '@mui/icons-material/Menu';
 import Dashboard from '../Dashboard/Dashboard';
-import Container from '@mui/material/Container'
 import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
 
@@ -29,35 +33,38 @@ const styles = (theme) => ({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 8px',
+        background: '#7F7F7F'
 
-    },
-    drawerHeaderDiv: {
-        width: '200px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
     },
     content: {
         // flexGrow: 1,
         height: '100vh',
         overflow: 'auto',
         width: '100%',
+    }, userInfoDiv: {
+        padding: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
     },
-    container: {
-        maxWidth: 'unset'
-    },
+    userNameDiv: {
+        marginLeft: '5px',
+        color: '#172B4D',
+        fontWeight: 'bold',
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%'
+
+    }
 });
 class Backend extends Component {
     constructor(props) {
         super(props);
         this.state = {
             isDrawerOpen: false,
-            currentPage: 'HOME'
+            currentPage: 'HOME',
+            userName: 'UserName'
         }
-
-
     }
     clickListItem = (page) => {
         this.setState({
@@ -77,17 +84,13 @@ class Backend extends Component {
     }
 
     render() {
-
         const { classes } = this.props;
         const toggleDrawer = (isDrawerOpen) => (event) => {
             if (
                 event &&
                 event.type === 'keydown' &&
                 (event.key === 'Tab' || event.key === 'Shift')
-            ) {
-                return;
-            }
-
+            ) return;
             this.setState({ isDrawerOpen });
         };
 
@@ -116,7 +119,7 @@ class Backend extends Component {
         return (
             <div>
                 <Box sx={{ flexGrow: 1 }}>
-                    <AppBar position="static">
+                    <AppBar position="static" style={{ background: '#272727' }} id="appBar">
                         <Toolbar>
                             <IconButton
                                 size="large"
@@ -143,8 +146,9 @@ class Backend extends Component {
                         onOpen={toggleDrawer(true)}
                     >
                         <div className={classes.drawerHeader}>
-                            <div className={classes.drawerHeaderDiv}>
-                                TITLE
+                            <div className={classes.userInfoDiv}>
+                                <Avatar alt="Remy Sharp" src="https://source.unsplash.com/random" />
+                                <div className={classes.userNameDiv}>{this.state.userName}</div>
                             </div>
                             <IconButton onClick={toggleDrawer(false)}>
                                 <ArrowLeftIcon />
@@ -152,10 +156,8 @@ class Backend extends Component {
                         </div>
                         <Divider />
                         {list()}
-                        {/* <HOCButton color="blue" text="高階元件按鈕" /> */}
                     </SwipeableDrawer>
                     <main className={classes.content}>
-                        <div className={classes.appBarSpacer} />
                         <Container className={classes.container}>
                             {this.renderSwitch()}
                         </Container>
