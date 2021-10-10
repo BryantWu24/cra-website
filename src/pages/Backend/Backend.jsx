@@ -26,10 +26,10 @@ import {
 import { mainListItems } from './ListItem'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import MenuIcon from '@mui/icons-material/Menu';
-import LoginIcon from '@mui/icons-material/Login';
 import Dashboard from '../Dashboard/Dashboard';
 import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
+import Bakery from '../Bakery/Bakery';
 
 const styles = (theme) => ({
     root: {
@@ -90,6 +90,8 @@ class Backend extends Component {
                 return <Dashboard />
             case 'TOOL':
                 return <Tool />
+            case 'BAKERY':
+                return <Bakery />
             default:
                 return <Home />;
         }
