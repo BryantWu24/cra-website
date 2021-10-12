@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/styles';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 import {
     Typography,
     Button,
@@ -46,7 +48,7 @@ const styles = (theme) => ({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 8px',
-        background: '#7F7F7F'
+        // background: '#7F7F7F'
 
     },
     content: {
@@ -76,7 +78,6 @@ class Backend extends Component {
         this.state = {
             isDrawerOpen: false,
             currentPage: 'HOME',
-            userName: 'UserName',
             isLogInDialogOpen: false,
             isSignUpDialogOpen: false,
             signInfo: {
@@ -102,13 +103,22 @@ class Backend extends Component {
                 err_account: '',
                 err_password: '',
             },
-            isLoginClicked: false
+            isLoginClicked: false,
+            profile: {
+                avatar: '',
+                name: 'Guest',
+                auth: 'Guest',
+                list: ['DASHBOARD'],
+                isLogin: false
+            },
+            listItem: []
         }
 
         this.toggleLogInDialog = this.toggleLogInDialog.bind(this);
         this.toggleSignUpDialog = this.toggleSignUpDialog.bind(this);
         this.doSignUp = this.doSignUp.bind(this);
         this.doLogIn = this.doLogIn.bind(this);
+        this.doLogOut = this.doLogOut.bind(this);
         this.handleSignName = this.handleSignName.bind(this);
         this.handleSignPhone = this.handleSignPhone.bind(this);
         this.handleSignGender = this.handleSignGender.bind(this)
@@ -118,6 +128,22 @@ class Backend extends Component {
         this.handleLoginAccount = this.handleLoginAccount.bind(this)
         this.handleLoginPassword = this.handleLoginPassword.bind(this)
         this.verify = this.verify.bind(this);
+    }
+    componentDidMount = () => {
+        this.setListItem();
+    }
+    // 設定目錄
+    setListItem = async () => {
+        const listItem = [];
+        mainListItems.forEach((item) => {
+            if (!!~this.state.profile.list.indexOf(item.key)) {
+                listItem.push(item)
+            }
+        })
+        await this.setState({
+            listItem
+        })
+
     }
     // 點擊目錄
     clickListItem = (page) => {
@@ -200,8 +226,23 @@ class Backend extends Component {
             isLoginClicked: false
         })
     }
+    // 登出
+    doLogOut = async () => {
+        await this.setState(
+            {
+                profile: {
+                    avatar: '',
+                    name: 'Guest',
+                    auth: 'Guest',
+                    list: ['DASHBOARD'],
+                    isLogin: false
+                },
+                currentPage:'HOME'
+            })
+        this.setListItem();
+    }
     // 登入
-    doLogIn = () => {
+    doLogIn = async () => {
         const loginField = ['account', 'password'];
         const loginErrField = ['err_account', 'err_password'];
         const result = this.verify('login', this.state.loginInfo, loginField);
@@ -210,11 +251,23 @@ class Backend extends Component {
 
         if (!hasError) {
             result.isLogInDialogOpen = false;
+            const loginResult = {
+                code: '10200',
+                data: {
+                    avatar: 'https://source.unsplash.com/random',
+                    name: 'Bryant',
+                    auth: 'Administrator',
+                    list: ['DASHBOARD', 'TOOL', 'BAKERY'],
+                    isLogin: true
+                }
+            }
+            result.profile = loginResult.data;
             console.log('登入成功：', result);
         } else {
             console.log('登入失敗：', result);
         }
-        this.setState(result)
+        await this.setState(result)
+        this.setListItem();
     }
     // 註冊
     doSignUp = () => {
@@ -336,14 +389,17 @@ class Backend extends Component {
             >
                 <List>
                     {
-                        mainListItems.map((item, index) =>
-                        (<ListItem button key={index} onClick={() => { this.clickListItem(item.key) }}>
-                            <ListItemIcon >
-                                {item.icon}
-                            </ListItemIcon>
-                            <ListItemText primary={item.title} />
-                        </ListItem>)
-                        )
+                        (this.state.listItem?.length > 0) ?
+                            this.state.listItem.map((item, index) =>
+                            (<ListItem button key={index} onClick={() => { this.clickListItem(item.key) }}>
+                                <ListItemIcon >
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={item.title} />
+                            </ListItem>)
+                            )
+                            :
+                            <div></div>
                     }
                 </List>
             </Box>
@@ -367,7 +423,13 @@ class Backend extends Component {
                             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                                 News
                             </Typography>
-                            <Button color="inherit" onClick={() => { this.toggleLogInDialog(true) }}><AccountBoxIcon /></Button>
+                            {
+                                (this.state.profile?.isLogin)
+                                    ?
+                                    <div></div>
+                                    :
+                                    <Button color="inherit" onClick={() => { this.toggleLogInDialog(true) }}><AccountBoxIcon /></Button>
+                            }
                         </Toolbar>
                     </AppBar>
                 </Box>
@@ -380,13 +442,26 @@ class Backend extends Component {
                     >
                         <div className={classes.drawerHeader}>
                             <div className={classes.userInfoDiv}>
-                                <Avatar alt="Remy Sharp" src="https://source.unsplash.com/random" />
-                                <div className={classes.userNameDiv}>{this.state.userName}</div>
+                                {
+                                    (this.state.profile?.avatar?.length > 0)
+                                        ?
+                                        <Avatar alt="Remy Sharp" src={this.state.profile.avatar} />
+                                        :
+                                        <AccountCircleIcon />
+                                }
+                                <div className={classes.userNameDiv}>{this.state.profile.name}</div>
                             </div>
                             <IconButton onClick={toggleDrawer(false)}>
                                 <ArrowLeftIcon />
                             </IconButton>
                         </div>
+                        {
+                            (this.state.profile?.isLogin)
+                                ?
+                                <Button color="inherit" onClick={this.doLogOut}><LogoutIcon /></Button>
+                                :
+                                <div></div>
+                        }
                         <Divider />
                         {list()}
                     </SwipeableDrawer>
@@ -401,7 +476,6 @@ class Backend extends Component {
                     <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >註冊</DialogTitle>
                     <DialogContent style={{ background: '#959595', color: 'white' }} >
                         {/* <DialogContentText style={{ background: '#959595', color: 'white' }} >
-                            
                         </DialogContentText> */}
                         <TextField
                             autoFocus
@@ -417,7 +491,6 @@ class Backend extends Component {
                             helperText={this.state.signInfo.err_name}
                             error={(this.state.signInfo?.err_name?.length > 0 && !!this.state.isSignUpClicked)}
                         />
-
                         <FormControl component="fieldset" style={{ marginTop: '1rem' }}>
                             <FormLabel component="legend"
                                 color="secondary">性別</FormLabel>
@@ -543,7 +616,6 @@ class Backend extends Component {
                         </div>
                     </DialogActions>
                 </Dialog>
-
             </div>
         );
     }

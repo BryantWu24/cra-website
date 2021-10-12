@@ -48,8 +48,8 @@ class BakeryCard extends Component {
                                 (this.props.data?.ingredients) ?
                                     this.props.data.ingredients.map((item, index) => {
                                         if (index === this.props.data.ingredients.length - 1)
-                                            return <span>{item}</span>
-                                        else return <span>{item + '、'}</span>
+                                            return <span key={index}>{item}</span>
+                                        else return <span key={index}>{item + '、'}</span>
                                     }) : <div></div>
                             }
                         </Typography>
