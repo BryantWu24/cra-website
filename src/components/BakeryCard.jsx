@@ -6,21 +6,35 @@ import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 class BakeryCard extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-
+            isLoading: true
         }
+        this.handleImgOnLoad = this.handleImgOnLoad.bind(this);
+    }
+
+    handleImgOnLoad = () => {
+        this.setState({
+            isLoading: false
+        })
     }
 
     render() {
         const price = '$' + this.props.data.price;
         return (
             <div>
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={this.state.isLoading}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
                 <Card sx={{ maxWidth: 345 }}>
                     <CardHeader
                         title={this.props.data.title}
@@ -35,6 +49,7 @@ class BakeryCard extends Component {
                         height="194"
                         image="https://source.unsplash.com/random/400x200"
                         alt="Picture"
+                        onLoad={this.handleImgOnLoad}
                     />
                     <CardContent>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>

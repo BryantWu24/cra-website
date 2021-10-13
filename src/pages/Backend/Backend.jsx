@@ -124,9 +124,23 @@ class Backend extends Component {
         this.handleLoginPassword = this.handleLoginPassword.bind(this)
         this.verify = this.verify.bind(this);
     }
-    componentDidMount = () => {
-        this.setListItem();
+    componentDidMount = async () => {
+        window.onbeforeunload = () => {
+            sessionStorage.setItem('currentPage', this.state.currentPage);
+        }
+
+        if (!!sessionStorage.getItem('currentPage')) {
+            const currentPage = sessionStorage.getItem('currentPage');
+            await this.setState({ currentPage })
+        }
+
+        if (!!localStorage.getItem('profile')) {
+            const profile = JSON.parse(localStorage.getItem('profile'));
+            await this.setState({ profile })
+            await this.setListItem();
+        }
     }
+
     // 設定目錄
     setListItem = async () => {
         const listItem = [];
@@ -135,8 +149,12 @@ class Backend extends Component {
                 listItem.push(item)
             }
         })
+        let currentPage = this.state.currentPage;
+        if (!~listItem.indexOf(currentPage)) currentPage = 'HOME';
+
+
         await this.setState({
-            listItem
+            listItem, currentPage
         })
     }
     // 點擊目錄
@@ -228,7 +246,6 @@ class Backend extends Component {
                         isSignUpDialogOpen: false,
                         isLogInDialogOpen: false,
                     })
-                this.setListItem();
                 break;
             default:
                 break;
@@ -266,7 +283,9 @@ class Backend extends Component {
                 currentPage: 'HOME',
                 isLogOutDialogOpen: false
             })
+        localStorage.removeItem('profile')
         this.setListItem();
+
     }
     // 登入
     doLogIn = async () => {
@@ -288,6 +307,7 @@ class Backend extends Component {
                     isLogin: true
                 }
             }
+            localStorage.setItem('profile', JSON.stringify(loginResult.data));
             result.profile = loginResult.data;
             console.log('登入成功：', result);
         } else {
@@ -447,7 +467,7 @@ class Backend extends Component {
                             {
                                 (this.state.profile?.isLogin)
                                     ?
-                                    <div></div>
+                                    <Button color="inherit" onClick={() => { this.showDialog('logOut') }}><LogoutIcon /></Button>
                                     :
                                     <Button color="inherit" onClick={() => { this.showDialog('logIn') }}><AccountBoxIcon /></Button>
                             }
@@ -476,13 +496,6 @@ class Backend extends Component {
                                 <ArrowLeftIcon />
                             </IconButton>
                         </div>
-                        {
-                            (this.state.profile?.isLogin)
-                                ?
-                                <Button color="inherit" onClick={() => { this.showDialog('logOut') }}><LogoutIcon /></Button>
-                                :
-                                <div></div>
-                        }
                         <Divider />
                         {list()}
                     </SwipeableDrawer>
