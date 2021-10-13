@@ -1,7 +1,9 @@
 
 import React, { Component } from 'react'
 import BakeryCard from '../../components/BakeryCard'
-
+import {
+    Grid
+} from '@mui/material';
 export default class Bakery extends Component {
 
     constructor() {
@@ -43,11 +45,13 @@ export default class Bakery extends Component {
     render() {
         return (
             <div>
-                {
-                    this.state.newsData.map((item, idx) => {
-                        return <BakeryCard data={item} key={idx} />
-                    })
-                }
+                <Grid container spacing={2}>
+                    {
+                        this.state.newsData.map((item, idx) => {
+                            return (<Grid item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} /></Grid>)
+                        })
+                    }
+                </Grid>
             </div>
         )
     }
