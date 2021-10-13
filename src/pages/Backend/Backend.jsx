@@ -28,7 +28,7 @@ import {
     FormLabel,
     FormControl,
     FormControlLabel,
-    // DialogContentText,
+    DialogContentText,
 } from '@mui/material';
 import { mainListItems } from './ListItem'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
@@ -37,7 +37,6 @@ import Dashboard from '../Dashboard/Dashboard';
 import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
 import Bakery from '../Bakery/Bakery';
-
 
 const styles = (theme) => ({
     root: {
@@ -48,8 +47,6 @@ const styles = (theme) => ({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 8px',
-        // background: '#7F7F7F'
-
     },
     content: {
         // flexGrow: 1,
@@ -78,9 +75,10 @@ class Backend extends Component {
         this.state = {
             isDrawerOpen: false,
             currentPage: 'HOME',
-            isLogInDialogOpen: false,
-            isSignUpDialogOpen: false,
-            signInfo: {
+            isLogInDialogOpen: false, // 登入 Dialog 狀態
+            isLogOutDialogOpen: false, // 登出 Dialog 狀態
+            isSignUpDialogOpen: false, // 註冊 Dialog 狀態
+            signInfo: { // 註冊表單資料
                 name: '',
                 password: '',
                 account: '',
@@ -96,14 +94,14 @@ class Backend extends Component {
                 err_gender: '',
                 err_avatar: '',
             },
-            isSignUpClicked: false,
-            loginInfo: {
+            loginInfo: { // 登入表單資料
                 account: '',
                 password: '',
                 err_account: '',
                 err_password: '',
             },
-            isLoginClicked: false,
+            isSignUpClicked: false, // 註冊表單是否按下註冊按鈕
+            isLoginClicked: false, // 登入表單是否按下登入按鈕
             profile: {
                 avatar: '',
                 name: 'Guest',
@@ -111,11 +109,8 @@ class Backend extends Component {
                 list: ['DASHBOARD'],
                 isLogin: false
             },
-            listItem: []
+            listItem: [] // 目錄
         }
-
-        this.toggleLogInDialog = this.toggleLogInDialog.bind(this);
-        this.toggleSignUpDialog = this.toggleSignUpDialog.bind(this);
         this.doSignUp = this.doSignUp.bind(this);
         this.doLogIn = this.doLogIn.bind(this);
         this.doLogOut = this.doLogOut.bind(this);
@@ -143,7 +138,6 @@ class Backend extends Component {
         await this.setState({
             listItem
         })
-
     }
     // 點擊目錄
     clickListItem = (page) => {
@@ -164,67 +158,99 @@ class Backend extends Component {
                 return <Home />;
         }
     }
-    // 前往註冊
-    goSignUp = () => {
-        this.setState({
-            isSignUpDialogOpen: true,
-            isLogInDialogOpen: false,
-            signInfo: {
-                name: '',
-                password: '',
-                account: '',
-                email: '',
-                phone: '',
-                gender: 'male',
-                avatar: '',
-                err_name: '',
-                err_password: '',
-                err_account: '',
-                err_email: '',
-                err_phone: '',
-                err_gender: '',
-                err_avatar: '',
-            },
-            isSignUpClicked: false,
-            loginInfo: {
-                account: '',
-                password: '',
-                err_account: '',
-                err_password: '',
-            },
-            isLoginClicked: false
-        })
+    // 顯示 Dialog
+    showDialog = async (mode) => {
+        switch (mode) {
+            case 'signUp':
+                await this.setState({
+                    isSignUpDialogOpen: true,
+                    isLogInDialogOpen: false,
+                    signInfo: {
+                        name: '',
+                        password: '',
+                        account: '',
+                        email: '',
+                        phone: '',
+                        gender: 'male',
+                        avatar: '',
+                        err_name: '',
+                        err_password: '',
+                        err_account: '',
+                        err_email: '',
+                        err_phone: '',
+                        err_gender: '',
+                        err_avatar: '',
+                    },
+                    isSignUpClicked: false,
+                    loginInfo: {
+                        account: '',
+                        password: '',
+                        err_account: '',
+                        err_password: '',
+                    },
+                    isLoginClicked: false
+                });
+                break;
+            case 'logIn':
+                await this.setState({
+                    isSignUpDialogOpen: false,
+                    isLogInDialogOpen: true,
+                    signInfo: {
+                        name: '',
+                        password: '',
+                        account: '',
+                        email: '',
+                        phone: '',
+                        gender: 'male',
+                        avatar: '',
+                        err_name: '',
+                        err_password: '',
+                        err_account: '',
+                        err_email: '',
+                        err_phone: '',
+                        err_gender: '',
+                        err_avatar: '',
+                    },
+                    isSignUpClicked: false,
+                    loginInfo: {
+                        account: '',
+                        password: '',
+                        err_account: '',
+                        err_password: '',
+                    },
+                    isLoginClicked: false
+                })
+                break;
+            case 'logOut':
+                await this.setState(
+                    {
+                        isLogOutDialogOpen: true,
+                        isSignUpDialogOpen: false,
+                        isLogInDialogOpen: false,
+                    })
+                this.setListItem();
+                break;
+            default:
+                break;
+        }
     }
-    // 前往登入
-    goLogIn = () => {
-        this.setState({
-            isSignUpDialogOpen: false,
-            isLogInDialogOpen: true,
-            signInfo: {
-                name: '',
-                password: '',
-                account: '',
-                email: '',
-                phone: '',
-                gender: 'male',
-                avatar: '',
-                err_name: '',
-                err_password: '',
-                err_account: '',
-                err_email: '',
-                err_phone: '',
-                err_gender: '',
-                err_avatar: '',
-            },
-            isSignUpClicked: false,
-            loginInfo: {
-                account: '',
-                password: '',
-                err_account: '',
-                err_password: '',
-            },
-            isLoginClicked: false
-        })
+    // 關閉 Dialog
+    closeDialog = (mode) => {
+        const state = {};
+        switch (mode) {
+            case 'signUp':
+                state.isSignUpDialogOpen = false;
+                break;
+            case 'logIn':
+                state.isLogInDialogOpen = false;
+                break;
+            case 'logOut':
+                state.isLogOutDialogOpen = false;
+                break;
+            default:
+                break;
+        }
+        this.setState(state);
     }
     // 登出
     doLogOut = async () => {
@@ -237,7 +263,8 @@ class Backend extends Component {
                     list: ['DASHBOARD'],
                     isLogin: false
                 },
-                currentPage:'HOME'
+                currentPage: 'HOME',
+                isLogOutDialogOpen: false
             })
         this.setListItem();
     }
@@ -270,7 +297,7 @@ class Backend extends Component {
         this.setListItem();
     }
     // 註冊
-    doSignUp = () => {
+    doSignUp = async () => {
         const signField = ['name', 'phone', 'gender', 'account', 'email', 'password'];
         const signErrField = ['err_name', 'err_phone', 'err_gender', 'err_account', 'err_email', 'err_password'];
         const result = this.verify('sign', this.state.signInfo, signField);
@@ -279,23 +306,17 @@ class Backend extends Component {
 
         if (!hasError) {
             result.isSignUpDialogOpen = false;
+            const loginInfo = {
+                account: this.state.signInfo.account,
+                password: this.state.signInfo.password
+            }
+            result.loginInfo = loginInfo;
+            await this.setState(result)
+            this.doLogIn();
             console.log('註冊成功：', result);
         } else {
             console.log('註冊失敗：', result);
         }
-        this.setState(result)
-    }
-    // 切換登入視窗
-    toggleLogInDialog = (status) => {
-        this.setState({
-            isLogInDialogOpen: status
-        })
-    }
-    // 切換註冊視窗
-    toggleSignUpDialog = (status) => {
-        this.setState({
-            isSignUpDialogOpen: status
-        })
     }
     // 驗證欄位
     // 當欄位為字串會直接寫入 state ；否則回傳結果
@@ -428,7 +449,7 @@ class Backend extends Component {
                                     ?
                                     <div></div>
                                     :
-                                    <Button color="inherit" onClick={() => { this.toggleLogInDialog(true) }}><AccountBoxIcon /></Button>
+                                    <Button color="inherit" onClick={() => { this.showDialog('logIn') }}><AccountBoxIcon /></Button>
                             }
                         </Toolbar>
                     </AppBar>
@@ -458,7 +479,7 @@ class Backend extends Component {
                         {
                             (this.state.profile?.isLogin)
                                 ?
-                                <Button color="inherit" onClick={this.doLogOut}><LogoutIcon /></Button>
+                                <Button color="inherit" onClick={() => { this.showDialog('logOut') }}><LogoutIcon /></Button>
                                 :
                                 <div></div>
                         }
@@ -560,10 +581,10 @@ class Backend extends Component {
                     <DialogActions style={{ background: '#959595' }} >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <div>
-                                <Button color="secondary" onClick={() => { this.goLogIn(false) }} >我要登入</Button>
+                                <Button color="secondary" onClick={() => { this.showDialog('logIn') }} >我要登入</Button>
                             </div>
                             <div>
-                                <Button color="secondary" onClick={() => { this.toggleSignUpDialog(false) }} >取消</Button>
+                                <Button color="secondary" onClick={() => { this.closeDialog('signUp') }} >取消</Button>
                                 <Button color="secondary" onClick={this.doSignUp}>註冊</Button>
                             </div>
                         </div>
@@ -607,13 +628,26 @@ class Backend extends Component {
                     <DialogActions style={{ background: '#959595' }} >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <div>
-                                <Button color="secondary" onClick={() => { this.goSignUp() }} >我要註冊</Button>
+                                <Button color="secondary" onClick={() => { this.showDialog('signUp') }} >我要註冊</Button>
                             </div>
                             <div>
-                                <Button color="secondary" onClick={() => { this.toggleLogInDialog(false) }} >取消</Button>
+                                <Button color="secondary" onClick={() => { this.closeDialog('logIn') }} >取消</Button>
                                 <Button color="secondary" onClick={this.doLogIn}>登入</Button>
                             </div>
                         </div>
+                    </DialogActions>
+                </Dialog>
+                {/* 確認登出 Dialog */}
+                <Dialog open={this.state.isLogOutDialogOpen} disableEscapeKeyDown id="log-out-dialog">
+                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >登出</DialogTitle>
+                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                        <DialogContentText style={{ background: '#959595', color: 'white' }} >
+                            請問確定要登出了嗎?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions style={{ background: '#959595' }} >
+                        <Button color="secondary" onClick={() => { this.closeDialog('logOut') }} >取消</Button>
+                        <Button color="secondary" onClick={this.doLogOut}>登出</Button>
                     </DialogActions>
                 </Dialog>
             </div>
