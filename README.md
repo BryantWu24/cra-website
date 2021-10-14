@@ -3,6 +3,17 @@
 npm install @mui/material
 npm install @emotion/react @emotion/styled
 npm install @mui/icons-material
+
+
+```
+
+# 安裝 x-data-grid
+https://mui.com/zh/components/data-grid/getting-started/#installation
+```
+npm install @mui/material @mui/styles
+npm install @mui/material @mui/styles
+
+
 ```
 
 # Getting Started with Create React App

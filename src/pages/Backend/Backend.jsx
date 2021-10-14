@@ -37,6 +37,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
 import Bakery from '../Bakery/Bakery';
+import BakeryManage from '../BakeryManage/BakeryManage';
 
 const styles = (theme) => ({
     root: {
@@ -172,6 +173,8 @@ class Backend extends Component {
                 return <Tool />
             case 'BAKERY':
                 return <Bakery />
+            case 'BAKERY_MANAGE':
+                return <BakeryManage />
             default:
                 return <Home />;
         }
@@ -303,7 +306,7 @@ class Backend extends Component {
                     avatar: 'https://source.unsplash.com/random',
                     name: 'Bryant',
                     auth: 'Administrator',
-                    list: ['DASHBOARD', 'TOOL', 'BAKERY'],
+                    list: ['DASHBOARD', 'TOOL', 'BAKERY', 'BAKERY_MANAGE'],
                     isLogin: true
                 }
             }
