@@ -30,7 +30,7 @@ import {
     FormControl,
     FormControlLabel,
     Checkbox,
-    DialogContentText,
+    DialogContentText
 } from '@mui/material';
 import { mainListItems } from './ListItem'
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
@@ -41,6 +41,8 @@ import Home from '../Home/Home';
 import Bakery from '../Bakery/Bakery';
 import BakeryManage from '../BakeryManage/BakeryManage';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const styles = (theme) => ({
     root: {
@@ -73,15 +75,22 @@ const styles = (theme) => ({
 
     }
 });
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 class Backend extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isSnackbarOpen: false,
+            alertSeverity: 'success',
             isDrawerOpen: false,
             currentPage: 'HOME',
             isLogInDialogOpen: false, // 登入 Dialog 狀態
             isLogOutDialogOpen: false, // 登出 Dialog 狀態
             isSignUpDialogOpen: false, // 註冊 Dialog 狀態
+            snackbarMsg: '',
             signInfo: { // 註冊表單資料
                 name: '',
                 password: '',
@@ -306,6 +315,14 @@ class Backend extends Component {
         this.setListItem();
 
     }
+    showSnackbar = async (severity, msg) => {
+        await this.setState({
+            snackbarMsg: msg,
+            alertSeverity: severity,
+            isSnackbarOpen: true
+        })
+    }
+
     // 登入
     doLogIn = async () => {
         const loginField = ['account', 'password'];
@@ -328,9 +345,12 @@ class Backend extends Component {
             }
             localStorage.setItem('profile', JSON.stringify(loginResult.data));
             result.profile = loginResult.data;
-            console.log('登入成功：', result);
+
+            const snackbarMsg = '歡迎 ' + loginResult.data.name + ' 蒞臨本網站';
+            this.showSnackbar('success', snackbarMsg);
         } else {
-            console.log('登入失敗：', result);
+            const snackbarMsg = '登入失敗，請聯繫技術人員';
+            this.showSnackbar('error', snackbarMsg);
         }
         await this.setState(result)
         this.setListItem();
@@ -346,6 +366,8 @@ class Backend extends Component {
         console.log('signInfo:', this.state.signInfo)
         if (!hasError) {
             result.isSignUpDialogOpen = false;
+            const snackbarMsg = '註冊成功';
+            this.showSnackbar('success', snackbarMsg);
             const loginInfo = {
                 account: this.state.signInfo.account,
                 password: this.state.signInfo.password
@@ -353,9 +375,9 @@ class Backend extends Component {
             result.loginInfo = loginInfo;
             await this.setState(result)
             this.doLogIn();
-            console.log('註冊成功：', result);
         } else {
-            console.log('註冊失敗：', result);
+            const snackbarMsg = '註冊失敗，請聯繫技術人員';
+            this.showSnackbar('error', snackbarMsg);
         }
     }
     // 驗證欄位
@@ -440,6 +462,23 @@ class Backend extends Component {
         curLoginInfo.password = $event.target.value;
         this.verify('login', curLoginInfo, 'password')
     }
+    // 通知框
+    handleSnackbarState(state) {
+        switch (state) {
+            case 'close':
+                this.setState({
+                    isSnackbarOpen: false
+                })
+                break;
+            case 'open':
+                this.setState({
+                    isSnackbarOpen: true
+                })
+                break;
+            default:
+                break;
+        }
+    }
     render() {
         const { classes } = this.props;
         const toggleDrawer = (isDrawerOpen) => (event) => {
@@ -478,6 +517,20 @@ class Backend extends Component {
 
         return (
             <div>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                    open={this.state.isSnackbarOpen}
+                    autoHideDuration={5000}
+                    onClose={() => { this.handleSnackbarState('close') }}
+                    key={'top center'}
+                >
+                    <Alert onClose={() => { this.handleSnackbarState('close') }} severity="success" sx={{ width: '100%' }}>
+                        {this.state.snackbarMsg}
+                    </Alert>
+                </Snackbar>
                 <Box sx={{ flexGrow: 1 }}>
                     <AppBar position="static" style={{ background: '#272727' }} >
                         <Toolbar>
