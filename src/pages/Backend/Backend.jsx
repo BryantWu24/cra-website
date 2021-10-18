@@ -25,9 +25,11 @@ import {
     RadioGroup,
     Radio,
     DialogTitle,
+    FormGroup,
     FormLabel,
     FormControl,
     FormControlLabel,
+    Checkbox,
     DialogContentText,
 } from '@mui/material';
 import { mainListItems } from './ListItem'
@@ -38,6 +40,7 @@ import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
 import Bakery from '../Bakery/Bakery';
 import BakeryManage from '../BakeryManage/BakeryManage';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 
 const styles = (theme) => ({
     root: {
@@ -87,6 +90,10 @@ class Backend extends Component {
                 phone: '',
                 gender: 'male',
                 avatar: '',
+                function: {
+                    bakery: '',
+                    bakeryManage: '',
+                },
                 err_name: '',
                 err_password: '',
                 err_account: '',
@@ -123,6 +130,7 @@ class Backend extends Component {
         this.handleSignEmail = this.handleSignEmail.bind(this)
         this.handleLoginAccount = this.handleLoginAccount.bind(this)
         this.handleLoginPassword = this.handleLoginPassword.bind(this)
+        this.handleFunctionChange = this.handleFunctionChange.bind(this)
         this.verify = this.verify.bind(this);
     }
     componentDidMount = async () => {
@@ -194,6 +202,10 @@ class Backend extends Component {
                         phone: '',
                         gender: 'male',
                         avatar: '',
+                        function: {
+                            bakery: false,
+                            bakeryManage: false
+                        },
                         err_name: '',
                         err_password: '',
                         err_account: '',
@@ -224,6 +236,10 @@ class Backend extends Component {
                         phone: '',
                         gender: 'male',
                         avatar: '',
+                        function: {
+                            bakery: false,
+                            bakeryManage: false
+                        },
                         err_name: '',
                         err_password: '',
                         err_account: '',
@@ -324,9 +340,10 @@ class Backend extends Component {
         const signField = ['name', 'phone', 'gender', 'account', 'email', 'password'];
         const signErrField = ['err_name', 'err_phone', 'err_gender', 'err_account', 'err_email', 'err_password'];
         const result = this.verify('sign', this.state.signInfo, signField);
+        result.function = this.state.signInfo.function;
         result.isSignUpClicked = true;
         const hasError = signErrField.some(item => result.signInfo[item] !== '');
-
+        console.log('signInfo:', this.state.signInfo)
         if (!hasError) {
             result.isSignUpDialogOpen = false;
             const loginInfo = {
@@ -400,6 +417,16 @@ class Backend extends Component {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.email = $event.target.value;
         this.verify('sign', curSingInfo, 'email')
+    }
+    // 註冊：功能勾選框
+    handleFunctionChange($event) {
+        const functionGroup = this.state.signInfo.function;
+        functionGroup[$event.target.name] = $event.target.checked;
+        const signInfo = this.state.signInfo;
+        signInfo.function = functionGroup;
+        this.setState({
+            signInfo
+        })
     }
     // 登入：帳號
     handleLoginAccount($event) {
@@ -550,7 +577,6 @@ class Backend extends Component {
                             color="secondary"
                             onChange={this.handleSignPhone}
                             value={this.state.signInfo.phone}
-
                             helperText={this.state.signInfo.err_phone}
                             error={(this.state.signInfo?.err_phone?.length > 0 && !!this.state.isSignUpClicked)}
                         />
@@ -593,6 +619,18 @@ class Backend extends Component {
                             helperText={this.state.signInfo.err_password}
                             error={(this.state.signInfo?.err_password?.length > 0 && !!this.state.isSignUpClicked)}
                         />
+                        <Typography style={{ color: '#3C3C3C', paddingTop: '1rem' }}>
+                            授權功能
+                        </Typography>
+                        <FormGroup>
+                            <FormControlLabel control={<Checkbox onChange={this.handleFunctionChange} />} name="bakery" label="麵包坊" style={{ color: '#3C3C3C' }} />
+                            <FormControlLabel control={<Checkbox onChange={this.handleFunctionChange} disabled />} name="bakeryManage" label="麵包坊管理平台" style={{ color: '#3C3C3C' }} />
+                            <FormControlLabel control={<Checkbox onChange={this.handleFunctionChange} disabled />} name="tool" label="工具" style={{ color: '#3C3C3C' }} />
+                        </FormGroup>
+                        <div style={{ display: 'flex', alignItems: 'center', color: 'red', fontSize: '1rem' }}>
+                            <ReportProblemIcon />  <label style={{ paddingLeft: '5px' }}>部分授權功能需通過審核才能使用，請聯繫授權人員</label>
+                        </div>
+
                     </DialogContent>
                     <DialogActions style={{ background: '#959595' }} >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
