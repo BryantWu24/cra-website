@@ -44,7 +44,7 @@ class BakeryCard extends Component {
                 </Backdrop>
                 <Card sx={{ maxWidth: 345 }}>
                     <CardHeader
-                        title={this.props.data.title}
+                        title={this.props.data.productName}
                         action={
                             <IconButton aria-label="add to cart" onClick={this.passInfo} >
                                 <AddShoppingCartIcon />
@@ -63,7 +63,7 @@ class BakeryCard extends Component {
                             價格：{price}
                         </Typography>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>
-                            剩餘數量：{this.props.data.remaind}
+                            剩餘數量：{this.props.data.storageCount}
                         </Typography>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>
                             成分：{
