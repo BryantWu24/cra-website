@@ -50,7 +50,9 @@ class BakeryManage extends Component {
     doCreate = () => {
         this.setState({
             mode: 'create',
-            title: '新增商品'
+            title: '新增商品',
+            selectItemData:[],
+            selectItemId:[]
         })
     }
 
@@ -91,7 +93,7 @@ class BakeryManage extends Component {
             productName: '麵包一',
             unitPrice: 100,
             storageCount: 0,
-            ingredients: ['麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '麵粉', '鮮奶', '紅豆'],
+            ingredients: ['1', '2', '3', '4', '5', '6'],
             storageDays: 3,
             storageMethod: '12小時內未食用完必須冰冷藏',
             id: 0
@@ -108,7 +110,7 @@ class BakeryManage extends Component {
             productName: '麵包32',
             unitPrice: 80,
             storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
+            ingredients: ['麵粉', '奶油', '糖粉'],
             storageDays: 5,
             storageMethod: '24小時內未食用完必須冰冷藏'
         }, {
@@ -116,63 +118,7 @@ class BakeryManage extends Component {
             productName: '麵包32',
             unitPrice: 80,
             storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 4,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 5,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 6,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 7,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 8,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 9,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 10,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
+            ingredients: ['麵粉', '鮮奶', '巧克力'],
             storageDays: 5,
             storageMethod: '24小時內未食用完必須冰冷藏'
         }]
@@ -218,7 +164,7 @@ class BakeryManage extends Component {
                 <Grid item xs={12}>
                     Bakery 後臺管理系統 - {this.state.title}
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px' }}>
                         <div>
                             <Button variant="outlined" startIcon={<ListAltIcon />} onClick={this.showList} disabled={(this.state.mode === 'list') ? true : false}>
@@ -229,7 +175,7 @@ class BakeryManage extends Component {
                             <Button variant="outlined" startIcon={<DeleteIcon />} onClick={this.doDelete} disabled={(this.state.selectItemData.length === 0) ? true : (this.state.mode === 'list') ? false : true}>
                                 刪除
                             </Button>
-                            <Button variant="outlined" startIcon={<AddIcon />} onClick={this.doCreate} disabled={(this.state.mode === 'create') ? true : false}>
+                            <Button variant="outlined" startIcon={<AddIcon />} onClick={this.doCreate} disabled={(this.state.mode !== 'list') ? true : false}>
                                 新增
                             </Button>
                             <Button variant="outlined" startIcon={<EditIcon />} onClick={this.doEdit} disabled={(this.state.selectItemData.length !== 1) ? true : (this.state.mode === 'list') ? false : true}>

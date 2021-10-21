@@ -315,6 +315,7 @@ class Backend extends Component {
         this.setListItem();
 
     }
+    // 顯示通知框
     showSnackbar = async (severity, msg) => {
         await this.setState({
             snackbarMsg: msg,
@@ -462,7 +463,7 @@ class Backend extends Component {
         curLoginInfo.password = $event.target.value;
         this.verify('login', curLoginInfo, 'password')
     }
-    // 通知框
+    // 通知框開關
     handleSnackbarState(state) {
         switch (state) {
             case 'close':
@@ -527,7 +528,7 @@ class Backend extends Component {
                     onClose={() => { this.handleSnackbarState('close') }}
                     key={'top center'}
                 >
-                    <Alert onClose={() => { this.handleSnackbarState('close') }} severity="success" sx={{ width: '100%' }}>
+                    <Alert onClose={() => { this.handleSnackbarState('close') }} severity={this.state.alertSeverity} sx={{ width: '100%' }}>
                         {this.state.snackbarMsg}
                     </Alert>
                 </Snackbar>
