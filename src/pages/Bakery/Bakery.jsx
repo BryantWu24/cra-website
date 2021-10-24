@@ -49,6 +49,7 @@ export default class Bakery extends Component {
         this.handleProductInfo = this.handleProductInfo.bind(this);
         this.doOrder = this.doOrder.bind(this);
         this.openOrderListDialog = this.openOrderListDialog.bind(this);
+        this.doCheckOut = this.doCheckOut.bind(this);
 
     }
 
@@ -172,18 +173,22 @@ export default class Bakery extends Component {
             newsData: data
         })
     }
+    
+    // 結帳
+    doCheckOut = () => {
 
+    }
     componentDidMount = () => {
         this.getNewsData();
     }
 
     render() {
         return (
-            <div style={{ width: '100%' }}>
+            <div style={{ width: '100%', padding: '0.5rem' }}>
                 <Grid container spacing={2}>
                     {
                         this.state.newsData.map((item, idx) => {
-                            return (<Grid item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
+                            return (<Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
                         })
                     }
                 </Grid>
@@ -211,7 +216,7 @@ export default class Bakery extends Component {
                                 ?
                                 <div></div>
                                 :
-                                <Button color="secondary" onClick={this.doOrder} >下單</Button>
+                                <Button color="secondary" onClick={this.doOrder} >加入購物車</Button>
                         }
                     </DialogActions>
                 </Dialog>
@@ -259,6 +264,11 @@ export default class Bakery extends Component {
                     </DialogContent>
                     <DialogActions style={{ background: '#959595' }} >
                         <Button color="secondary" onClick={() => { this.closeDialog('orderList') }}>關閉</Button>
+                        {(this.state.orderList.length > 0)
+                            ?
+                            <Button color="secondary" onClick={this.doCheckOut}>結帳</Button>
+                            :
+                            <div></div>}
                     </DialogActions>
                 </Dialog>
                 <SpeedDial
