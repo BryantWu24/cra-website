@@ -14,10 +14,22 @@ import {
     Button,
     Divider,
     SpeedDialAction,
-    SpeedDial
+    SpeedDial,
+    IconButton
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 const actions = [
     { icon: <ShoppingCartIcon />, name: '購物清單' },
 ];
@@ -47,14 +59,61 @@ export default class Bakery extends Component {
         this.getNewsData = this.getNewsData.bind(this);
         this.handleCountChange = this.handleCountChange.bind(this);
         this.handleProductInfo = this.handleProductInfo.bind(this);
-        this.doOrder = this.doOrder.bind(this);
+        this.addCart = this.addCart.bind(this);
         this.openOrderListDialog = this.openOrderListDialog.bind(this);
         this.doCheckOut = this.doCheckOut.bind(this);
-
     }
 
     // 開啟購物清單 Dialog
     openOrderListDialog = () => {
+        this.countOrderTotalPrice();
+        const state = {};
+        state.isOrderListDialogOpen = true;
+        this.setState(state)
+    }
+    // 購物清單數量增加
+    orderListAdd = async (row, index) => {
+        const orderList = this.state.orderList;
+
+        if (orderList[index].storageCount > orderList[index].count) {
+            orderList[index].count++;
+            orderList[index].totalPrice = orderList[index].count * orderList[index].unitPrice;
+            await this.setState({ orderList });
+            this.countOrderTotalPrice();
+        } else {
+            alert('庫存數量不足，無法增加');
+        }
+    }
+    // 購物清單數量減少
+    orderListDecrease =async (row, index) => {
+        const orderList = this.state.orderList;
+
+        if (orderList[index].count === 1) orderList.splice(index, 1);
+        else {
+            orderList[index].count--;
+            orderList[index].totalPrice = orderList[index].count * orderList[index].unitPrice;
+        }
+        await this.setState({ orderList });
+        this.countOrderTotalPrice();
+    }
+    // 購物清單刪除
+    orderListDelete =async (row, index) => {
+        const orderList = this.state.orderList;
+        orderList.splice(index, 1);
+        await this.setState({ orderList });
+        this.countOrderTotalPrice();
+    }
+
+    // 接收到代表點擊新增購物按鈕
+    handleProductInfo = (info) => {
+        this.setState({
+            currentProductInfo: info,
+            isCartDialogOpen: true
+        })
+    }
+
+    // 計算訂單總金額
+    countOrderTotalPrice = async ()=>{
         const orderList = this.state.orderList;
         const state = {};
         if (orderList.length > 0) {
@@ -64,21 +123,11 @@ export default class Bakery extends Component {
             })
             state.orderTotalPrice = orderTotalPrice;
         }
-        state.isOrderListDialogOpen = true;
-        this.setState(state)
+        await this.setState(state);
     }
 
-    // 接收到代表點擊新增購物按鈕
-    handleProductInfo = (info) => {
-        console.log(info);
-        this.setState({
-            currentProductInfo: info,
-            isCartDialogOpen: true
-        })
-    }
-
-    // 下單
-    doOrder = () => {
+    // 加入購物車
+    addCart = () => {
         if (this.state.count !== 0) {
             const curOrderList = this.state.orderList;
             const orderInfo = {}
@@ -86,16 +135,17 @@ export default class Bakery extends Component {
             orderInfo.orderer = profile.name;
             orderInfo.productName = this.state.currentProductInfo.productName;
             orderInfo.count = this.state.count;
+            orderInfo.storageCount = this.state.currentProductInfo.storageCount
             orderInfo.unitPrice = this.state.currentProductInfo.unitPrice
             orderInfo.totalPrice = this.state.currentProductInfo.unitPrice * this.state.count;
             orderInfo.orderStatus = '備貨中'
             curOrderList.push(orderInfo);
             this.setState({
+                isCartDialogOpen: false,
                 count: 0,
-                orderList: curOrderList,
-                isCartDialogOpen: false
+                orderList: curOrderList
             })
-            console.log('下單資訊：', curOrderList)
+            console.log('加入購物車資訊：', curOrderList)
         } else {
             alert('請選擇數量')
         }
@@ -156,7 +206,7 @@ export default class Bakery extends Component {
         const data = [{
             productName: '麵包一',
             unitPrice: 100,
-            productImgUrl:'/bakeryImg/01.jpg',
+            productImgUrl: '/bakeryImg/01.jpg',
             storageCount: 0,
 
             ingredients: ['麵粉', '鮮奶', '紅豆'],
@@ -165,7 +215,7 @@ export default class Bakery extends Component {
         }, {
             productName: '麵包2',
             unitPrice: 80,
-            productImgUrl:'/bakeryImg/02.jpg',
+            productImgUrl: '/bakeryImg/02.jpg',
             storageCount: 12,
             ingredients: ['麵粉', '鮮奶', '糖粉'],
             storageDays: 5,
@@ -173,15 +223,15 @@ export default class Bakery extends Component {
         }, {
             productName: '麵包3',
             unitPrice: 60,
-            productImgUrl:'/bakeryImg/03.jpg',
+            productImgUrl: '/bakeryImg/03.jpg',
             storageCount: 7,
-            ingredients: ['麵粉', '鮮奶', '糖粉','花生'],
+            ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
             storageDays: 5,
             storageMethod: '24小時內未食用完必須冰冷藏'
         }, {
             productName: '麵包4',
             unitPrice: 110,
-            productImgUrl:'/bakeryImg/04.jpg',
+            productImgUrl: '/bakeryImg/04.jpg',
             storageCount: 2,
             ingredients: ['無鹽奶油', '鮮奶', '水'],
             storageDays: 3,
@@ -189,15 +239,15 @@ export default class Bakery extends Component {
         }, {
             productName: '麵包5',
             unitPrice: 60,
-            productImgUrl:'/bakeryImg/05.jpg',
+            productImgUrl: '/bakeryImg/05.jpg',
             storageCount: 7,
-            ingredients: ['麵粉', '鮮奶', '糖粉','花生'],
+            ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
             storageDays: 5,
             storageMethod: '24小時內未食用完必須冰冷藏'
         }, {
             productName: '麵包6',
             unitPrice: 110,
-            productImgUrl:'/bakeryImg/06.jpg',
+            productImgUrl: '/bakeryImg/06.jpg',
             storageCount: 2,
             ingredients: ['無鹽奶油', '鮮奶', '水'],
             storageDays: 3,
@@ -205,7 +255,7 @@ export default class Bakery extends Component {
         }, {
             productName: '麵包7',
             unitPrice: 110,
-            productImgUrl:'/bakeryImg/07.jpg',
+            productImgUrl: '/bakeryImg/07.jpg',
             storageCount: 2,
             ingredients: ['無鹽奶油', '鮮奶', '水'],
             storageDays: 3,
@@ -216,10 +266,10 @@ export default class Bakery extends Component {
             newsData: data
         })
     }
-    
+
     // 結帳
     doCheckOut = () => {
-
+        alert('結帳')
     }
     componentDidMount = () => {
         this.getNewsData();
@@ -259,7 +309,7 @@ export default class Bakery extends Component {
                                 ?
                                 <div></div>
                                 :
-                                <Button color="secondary" onClick={this.doOrder} >加入購物車</Button>
+                                <Button color="secondary" onClick={this.addCart} >加入購物車</Button>
                         }
                     </DialogActions>
                 </Dialog>
@@ -271,31 +321,48 @@ export default class Bakery extends Component {
                             (this.state.orderList.length > 0)
                                 ?
                                 <div>
+                                    <TableContainer component={Paper}>
+                                        <Table sx={{ minWidth: '100%' }} aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>商品名稱</TableCell>
+                                                    <TableCell align="center">單價</TableCell>
+                                                    <TableCell align="center">數量</TableCell>
+                                                    <TableCell align="center">總價</TableCell>
+                                                    <TableCell align="center">庫存數量</TableCell>
+                                                    <TableCell align="center">功能</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {this.state.orderList.map((row, index) => (
+                                                    <TableRow
+                                                        key={row.productName}
+                                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                    >
+                                                        <TableCell component="th" scope="row">
+                                                            {row.productName}
+                                                        </TableCell>
+                                                        <TableCell align="center">{row.unitPrice}</TableCell>
+                                                        <TableCell align="center">{row.count}</TableCell>
+                                                        <TableCell align="center">{row.totalPrice}</TableCell>
+                                                        <TableCell align="center">{row.storageCount}</TableCell>
+                                                        <TableCell align="center" >
+                                                            <IconButton color="primary" aria-label="upload picture" component="span" onClick={(() => { this.orderListAdd(row, index) })}>
+                                                                <AddIcon />
+                                                            </IconButton>
+                                                            <IconButton color="primary" aria-label="upload picture" component="span" onClick={(() => { this.orderListDecrease(row, index) })}>
+                                                                <RemoveIcon />
+                                                            </IconButton>
+                                                            <IconButton color="primary" aria-label="upload picture" component="span" onClick={(() => { this.orderListDelete(row, index) })}>
+                                                                <DeleteIcon />
+                                                            </IconButton>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
 
-                                    <table >
-                                        <thead>
-                                            <tr style={{ border: '1px black solid' }}>
-                                                <th style={{ border: '1px black solid' }}>商品名稱</th>
-                                                <th style={{ border: '1px black solid' }}>單價</th>
-                                                <th style={{ border: '1px black solid' }}>數量</th>
-                                                <th style={{ border: '1px black solid' }}>總價</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                this.state.orderList.map((item, idx) => {
-                                                    return (
-                                                        <tr key={idx}>
-                                                            <td style={{ border: '1px black solid' }}>{item.productName}</td>
-                                                            <td style={{ border: '1px black solid' }}>{item.unitPrice}</td>
-                                                            <td style={{ border: '1px black solid' }}>{item.count}</td>
-                                                            <td style={{ border: '1px black solid' }}>{item.totalPrice}</td>
-                                                        </tr>
-                                                    )
-                                                })
-                                            }
-                                        </tbody>
-                                    </table>
                                     <Divider />
                                     消費總金額：{this.state.orderTotalPrice}
                                 </div>
