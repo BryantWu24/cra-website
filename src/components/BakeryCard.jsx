@@ -53,8 +53,8 @@ class BakeryCard extends Component {
                     />
                     <CardMedia
                         component="img"
-                        height="194"
-                        image="https://source.unsplash.com/random/400x200"
+                        height="200"
+                        image={this.props.data.productImgUrl}
                         alt="Picture"
                         onLoad={this.handleImgOnLoad}
                     />

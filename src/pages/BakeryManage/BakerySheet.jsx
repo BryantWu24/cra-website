@@ -81,7 +81,7 @@ class BakerySheet extends Component {
 
     // 取得成分資料
     getMaterialData = () => {
-        const materialData = ['麵粉', '奶油', '糖粉', '鮮奶'];
+        const materialData = ['麵粉', '奶油', '糖粉', '鮮奶','無鹽奶油','水','糖霜','花生'];
         this.setState({ materialData })
     }
 

@@ -34,7 +34,7 @@ export default class Bakery extends Component {
             currentProductInfo: {
                 ingredients: [],
                 price: 0,
-                remaind: 0,
+                storageCount: 0,
                 storageDays: 0,
                 storageMethod: "",
                 title: ""
@@ -84,7 +84,7 @@ export default class Bakery extends Component {
             const orderInfo = {}
             const profile = JSON.parse(localStorage.getItem('profile'));
             orderInfo.orderer = profile.name;
-            orderInfo.productName = this.state.currentProductInfo.title;
+            orderInfo.productName = this.state.currentProductInfo.productName;
             orderInfo.count = this.state.count;
             orderInfo.unitPrice = this.state.currentProductInfo.unitPrice
             orderInfo.totalPrice = this.state.currentProductInfo.unitPrice * this.state.count;
@@ -126,9 +126,9 @@ export default class Bakery extends Component {
 
     // 設定數量下拉選單
     setSelectCountOption = () => {
-        const remaind = this.state.currentProductInfo.remaind;
+        const storageCount = this.state.currentProductInfo.storageCount;
         const ele = [];
-        for (let i = 0; i < remaind; i++) {
+        for (let i = 0; i < storageCount; i++) {
             ele.push(<MenuItem key={i} value={i}>{i}</MenuItem>)
         }
 
@@ -154,18 +154,61 @@ export default class Bakery extends Component {
     // 取得資料
     getNewsData = () => {
         const data = [{
-            title: '麵包一',
+            productName: '麵包一',
             unitPrice: 100,
-            remaind: 0,
+            productImgUrl:'/bakeryImg/01.jpg',
+            storageCount: 0,
+
             ingredients: ['麵粉', '鮮奶', '紅豆'],
             storageDays: 3,
             storageMethod: '12小時內未食用完必須冰冷藏'
         }, {
-            title: '麵包2',
+            productName: '麵包2',
             unitPrice: 80,
-            remaind: 12,
+            productImgUrl:'/bakeryImg/02.jpg',
+            storageCount: 12,
             ingredients: ['麵粉', '鮮奶', '糖粉'],
             storageDays: 5,
+            storageMethod: '24小時內未食用完必須冰冷藏'
+        }, {
+            productName: '麵包3',
+            unitPrice: 60,
+            productImgUrl:'/bakeryImg/03.jpg',
+            storageCount: 7,
+            ingredients: ['麵粉', '鮮奶', '糖粉','花生'],
+            storageDays: 5,
+            storageMethod: '24小時內未食用完必須冰冷藏'
+        }, {
+            productName: '麵包4',
+            unitPrice: 110,
+            productImgUrl:'/bakeryImg/04.jpg',
+            storageCount: 2,
+            ingredients: ['無鹽奶油', '鮮奶', '水'],
+            storageDays: 3,
+            storageMethod: '24小時內未食用完必須冰冷藏'
+        }, {
+            productName: '麵包5',
+            unitPrice: 60,
+            productImgUrl:'/bakeryImg/05.jpg',
+            storageCount: 7,
+            ingredients: ['麵粉', '鮮奶', '糖粉','花生'],
+            storageDays: 5,
+            storageMethod: '24小時內未食用完必須冰冷藏'
+        }, {
+            productName: '麵包6',
+            unitPrice: 110,
+            productImgUrl:'/bakeryImg/06.jpg',
+            storageCount: 2,
+            ingredients: ['無鹽奶油', '鮮奶', '水'],
+            storageDays: 3,
+            storageMethod: '24小時內未食用完必須冰冷藏'
+        }, {
+            productName: '麵包7',
+            unitPrice: 110,
+            productImgUrl:'/bakeryImg/07.jpg',
+            storageCount: 2,
+            ingredients: ['無鹽奶油', '鮮奶', '水'],
+            storageDays: 3,
             storageMethod: '24小時內未食用完必須冰冷藏'
         }]
 
@@ -194,10 +237,10 @@ export default class Bakery extends Component {
                 </Grid>
                 {/* 購物 Dialog */}
                 <Dialog open={this.state.isCartDialogOpen} disableEscapeKeyDown id="cart-dialog" >
-                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.title}</DialogTitle>
+                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.productName}</DialogTitle>
                     <DialogContent style={{ background: '#959595', color: 'white' }} >
                         {
-                            (this.state.currentProductInfo.remaind === 0)
+                            (this.state.currentProductInfo.storageCount === 0)
                                 ?
                                 <div></div>
                                 :
@@ -212,7 +255,7 @@ export default class Bakery extends Component {
                     <DialogActions style={{ background: '#959595' }} >
                         <Button color="secondary" onClick={() => { this.closeDialog('cart') }}>取消</Button>
                         {
-                            (this.state.currentProductInfo.remaind === 0)
+                            (this.state.currentProductInfo.storageCount === 0)
                                 ?
                                 <div></div>
                                 :
