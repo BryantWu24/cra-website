@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/styles';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import axios from 'axios'
 import {
     Typography,
     Button,
@@ -333,27 +334,46 @@ class Backend extends Component {
         const hasError = loginErrField.some(item => result.loginInfo[item] !== '');
 
         if (!hasError) {
-            result.isLogInDialogOpen = false;
-            const loginResult = {
-                code: '10200',
-                data: {
-                    avatar: 'https://source.unsplash.com/random',
-                    name: 'Bryant',
-                    auth: 'Administrator',
-                    list: ['DASHBOARD', 'TOOL', 'BAKERY', 'BAKERY_MANAGE'],
-                    isLogin: true
-                }
-            }
-            localStorage.setItem('profile', JSON.stringify(loginResult.data));
-            result.profile = loginResult.data;
+            axios
+                .post("http://localhost:7000/signin", {
+                    account: this.state.loginInfo.account,
+                    password: this.state.loginInfo.password,
+                })
+                .then((res) => {
+                    if (res.status === 200 && res.data?.length > 0) {
+                        const profile = this.state.profile;
+                        profile.avatar = res.data[0].FAvatar;
+                        profile.name = res.data[0].FUserName;
+                        profile.avatar = res.data[0].avatar;
+                        profile.isLogin=true;
+                        result.profile = profile;
+                        result.isLogInDialogOpen = false;
+                        this.setState(result)
+                        const snackbarMsg = '歡迎 ' + res.data[0].FUserName + ' 蒞臨本網站';
+                        this.showSnackbar('success', snackbarMsg);
+                    }
+                })
+                .catch((e) => {
+                    if (e.response.status === 500) {
+                        console.log(e);
+                        const snackbarMsg = '帳號或密碼輸入錯誤';
+                        this.showSnackbar('error', snackbarMsg);
+                    }
+                });
 
-            const snackbarMsg = '歡迎 ' + loginResult.data.name + ' 蒞臨本網站';
-            this.showSnackbar('success', snackbarMsg);
-        } else {
-            const snackbarMsg = '登入失敗，請聯繫技術人員';
-            this.showSnackbar('error', snackbarMsg);
-        }
-        await this.setState(result)
+            // const loginResult = {
+            //     code: '10200',
+            //     data: {
+            //         avatar: 'https://source.unsplash.com/random',
+            //         name: 'Bryant',
+            //         auth: 'Administrator',
+            //         list: ['DASHBOARD', 'TOOL', 'BAKERY', 'BAKERY_MANAGE'],
+            //         isLogin: true
+            //     }
+            // }
+            // localStorage.setItem('profile', JSON.stringify(loginResult.data));
+            // result.profile = loginResult.data;
+        } else this.showSnackbar('error', '請填寫正確的資料');
         this.setListItem();
     }
     // 註冊
