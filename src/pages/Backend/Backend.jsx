@@ -334,45 +334,37 @@ class Backend extends Component {
         const hasError = loginErrField.some(item => result.loginInfo[item] !== '');
 
         if (!hasError) {
-            axios
-                .post("http://localhost:7000/signin", {
+            await axios
+                .post("http://localhost:7000/login", {
                     account: this.state.loginInfo.account,
                     password: this.state.loginInfo.password,
                 })
                 .then((res) => {
-                    if (res.status === 200 && res.data?.length > 0) {
-                        const profile = this.state.profile;
-                        profile.avatar = res.data[0].FAvatar;
-                        profile.name = res.data[0].FUserName;
-                        profile.avatar = res.data[0].avatar;
-                        profile.isLogin=true;
-                        result.profile = profile;
-                        result.isLogInDialogOpen = false;
-                        this.setState(result)
-                        const snackbarMsg = '歡迎 ' + res.data[0].FUserName + ' 蒞臨本網站';
-                        this.showSnackbar('success', snackbarMsg);
-                    }
+                    if (!!res.data) {
+                        switch (res.data.code.toString()) {
+                            case '20000':
+                                const profile = this.state.profile;
+                                const data = res.data.data[0];
+                                profile.avatar = data.FAvatar;
+                                profile.name = data.FUserName;
+                                profile.id = data.FUserId;
+                                profile.list = data.list;
+                                profile.isLogin = true;
+                                result.profile = profile;
+                                result.isLogInDialogOpen = false;
+                                this.setState(result)
+                                const snackbarMsg = '歡迎 ' + data.FUserName + ' 蒞臨本網站';
+                                this.showSnackbar('success', snackbarMsg);
+                                break;
+                            case '20001':
+                                this.showSnackbar('error', res.data.message);
+                                break;
+                            default:
+                                break;
+                        }
+                    } else this.showSnackbar('error', '登入發生異常，請稍後再嘗試。');
                 })
-                .catch((e) => {
-                    if (e.response.status === 500) {
-                        console.log(e);
-                        const snackbarMsg = '帳號或密碼輸入錯誤';
-                        this.showSnackbar('error', snackbarMsg);
-                    }
-                });
-
-            // const loginResult = {
-            //     code: '10200',
-            //     data: {
-            //         avatar: 'https://source.unsplash.com/random',
-            //         name: 'Bryant',
-            //         auth: 'Administrator',
-            //         list: ['DASHBOARD', 'TOOL', 'BAKERY', 'BAKERY_MANAGE'],
-            //         isLogin: true
-            //     }
-            // }
-            // localStorage.setItem('profile', JSON.stringify(loginResult.data));
-            // result.profile = loginResult.data;
+                .catch((e) => { this.showSnackbar('error', '登入發生異常，請稍後再嘗試。'); });
         } else this.showSnackbar('error', '請填寫正確的資料');
         this.setListItem();
     }
