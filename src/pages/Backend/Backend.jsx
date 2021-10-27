@@ -124,7 +124,10 @@ class Backend extends Component {
                 avatar: '',
                 name: 'Guest',
                 auth: 'Guest',
-                list: ['DASHBOARD'],
+                list: [{
+                    title:'儀錶板',
+                    key:'DASHBOARD'
+                }],
                 isLogin: false
             },
             listItem: [] // 目錄
@@ -163,14 +166,21 @@ class Backend extends Component {
     // 設定目錄
     setListItem = async () => {
         const listItem = [];
+
         mainListItems.forEach((item) => {
-            if (!!~this.state.profile.list.indexOf(item.key)) {
-                listItem.push(item)
-            }
+            this.state.profile.list.forEach((items) => {
+                if (items.key === item.key) {
+                    item.title = items.title;
+                    listItem.push(item);
+                }
+            })
         })
         let currentPage = this.state.currentPage;
-        if (!~listItem.indexOf(currentPage)) currentPage = 'HOME';
-
+        let isPageNotFound = true;
+        listItem.forEach((item)=>{
+            if(item.key === currentPage) isPageNotFound = false;
+        })
+        if (!!isPageNotFound) currentPage = 'HOME';
 
         await this.setState({
             listItem, currentPage

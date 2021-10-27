@@ -55,11 +55,14 @@ app.post("/login", function async (req, res) {
                 return res.send(noDataResponse);
             } else {
                 db.query(
-                    `SELECT FListName FROM auth WHERE FRoleId='${userRows[0].FRoleId}'`,
+                    `SELECT * FROM auth WHERE FRoleId='${userRows[0].FRoleId}'`,
                     function (err, authRows, fields) {
                         const listAry = [];
                         authRows.forEach(item => {
-                            listAry.push(item.FListName.toUpperCase());
+                            listAry.push({
+                                key: item.FListKey.toUpperCase(),
+                                title: item.FListName
+                            });
                         });
                         userRows[0].list = listAry;
                         const response = apiResponse(20000, userRows);
