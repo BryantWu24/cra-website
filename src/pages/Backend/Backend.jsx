@@ -125,8 +125,8 @@ class Backend extends Component {
                 name: 'Guest',
                 auth: 'Guest',
                 list: [{
-                    title:'儀錶板',
-                    key:'DASHBOARD'
+                    title: '首頁',
+                    key: 'HOME'
                 }],
                 isLogin: false
             },
@@ -162,11 +162,9 @@ class Backend extends Component {
             await this.setListItem();
         }
     }
-
     // 設定目錄
     setListItem = async () => {
         const listItem = [];
-
         mainListItems.forEach((item) => {
             this.state.profile.list.forEach((items) => {
                 if (items.key === item.key) {
@@ -177,10 +175,10 @@ class Backend extends Component {
         })
         let currentPage = this.state.currentPage;
         let isPageNotFound = true;
-        listItem.forEach((item)=>{
-            if(item.key === currentPage) isPageNotFound = false;
+        listItem.forEach((item) => {
+            if (item.key === currentPage) isPageNotFound = false;
         })
-        if (!!isPageNotFound) currentPage = 'HOME';
+        if (!!isPageNotFound) currentPage = listItem[0]?.key || 'HOME';
 
         await this.setState({
             listItem, currentPage
@@ -201,7 +199,7 @@ class Backend extends Component {
                 return <Tool />
             case 'BAKERY':
                 return <Bakery />
-            case 'BAKERY_MANAGE':
+            case 'BAKERY MANAGE':
                 return <BakeryManage />
             default:
                 return <Home />;
@@ -316,7 +314,10 @@ class Backend extends Component {
                     avatar: '',
                     name: 'Guest',
                     auth: 'Guest',
-                    list: ['DASHBOARD'],
+                    list: [{
+                        title: '首頁',
+                        key: 'HOME'
+                    }],
                     isLogin: false
                 },
                 currentPage: 'HOME',
@@ -334,7 +335,6 @@ class Backend extends Component {
             isSnackbarOpen: true
         })
     }
-
     // 登入
     doLogIn = async () => {
         const loginField = ['account', 'password'];
@@ -383,25 +383,44 @@ class Backend extends Component {
         const signField = ['name', 'phone', 'gender', 'account', 'email', 'password'];
         const signErrField = ['err_name', 'err_phone', 'err_gender', 'err_account', 'err_email', 'err_password'];
         const result = this.verify('sign', this.state.signInfo, signField);
-        result.function = this.state.signInfo.function;
+        // result.function = this.state.signInfo.function;
         result.isSignUpClicked = true;
         const hasError = signErrField.some(item => result.signInfo[item] !== '');
-        console.log('signInfo:', this.state.signInfo)
         if (!hasError) {
-            result.isSignUpDialogOpen = false;
-            const snackbarMsg = '註冊成功';
-            this.showSnackbar('success', snackbarMsg);
-            const loginInfo = {
-                account: this.state.signInfo.account,
-                password: this.state.signInfo.password
-            }
-            result.loginInfo = loginInfo;
-            await this.setState(result)
-            this.doLogIn();
-        } else {
-            const snackbarMsg = '註冊失敗，請聯繫技術人員';
-            this.showSnackbar('error', snackbarMsg);
-        }
+            await axios
+                .post("http://localhost:7000/user/create", {
+                    FUserName: this.state.signInfo.name,
+                    FEmail: this.state.signInfo.email,
+                    FRoleId: '08292820-6f86-4566-bbb2-af267187ab1b', // BakeryUser
+                    FPhone: this.state.signInfo.phone,
+                    FAccount: this.state.signInfo.account,
+                    FPassword: this.state.signInfo.password,
+                    FGender: this.state.signInfo.gender,
+                    FAvatar: this.state.loginInfo.avatar,
+                })
+                .then((res) => {
+                    if (!!res.data) {
+                        switch (res.data.code.toString()) {
+                            case '20000':
+                                console.log('user create :', res.data);
+                                result.isSignUpDialogOpen = false;
+                                const snackbarMsg = '註冊成功';
+                                this.showSnackbar('success', snackbarMsg);
+                                const loginInfo = {
+                                    account: this.state.signInfo.account,
+                                    password: this.state.signInfo.password
+                                }
+                                result.loginInfo = loginInfo;
+                                this.setState(result)
+                                this.doLogIn();
+                                break;
+                            default:
+                                break;
+                        }
+                    } else this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。');
+                })
+                .catch((e) => { this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。'); });
+        } else this.showSnackbar('error', '請填寫正確的資料');
     }
     // 驗證欄位
     // 當欄位為字串會直接寫入 state ；否則回傳結果
@@ -695,7 +714,7 @@ class Backend extends Component {
                             helperText={this.state.signInfo.err_password}
                             error={(this.state.signInfo?.err_password?.length > 0 && !!this.state.isSignUpClicked)}
                         />
-                        <Typography style={{ color: '#3C3C3C', paddingTop: '1rem' }}>
+                        {/* <Typography style={{ color: '#3C3C3C', paddingTop: '1rem' }}>
                             授權功能
                         </Typography>
                         <FormGroup>
@@ -705,8 +724,7 @@ class Backend extends Component {
                         </FormGroup>
                         <div style={{ display: 'flex', alignItems: 'center', color: 'red', fontSize: '1rem' }}>
                             <ReportProblemIcon />  <label style={{ paddingLeft: '5px' }}>部分授權功能需通過審核才能使用，請聯繫授權人員</label>
-                        </div>
-
+                        </div> */}
                     </DialogContent>
                     <DialogActions style={{ background: '#959595' }} >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>

@@ -46,7 +46,6 @@ const apiResponse = (code, info) => {
 app.post("/login", function async (req, res) {
     var account = req.body.account;
     var password = req.body.password;
-
     db.query(
         `SELECT * FROM user WHERE FAccount='${account}' AND FPassword='${password}'`,
         function (err, userRows, fields) {
@@ -66,7 +65,6 @@ app.post("/login", function async (req, res) {
                         });
                         userRows[0].list = listAry;
                         const response = apiResponse(20000, userRows);
-                        console.log('login:', response);
                         return res.send(response);
                     }
                 )
@@ -74,3 +72,44 @@ app.post("/login", function async (req, res) {
         }
     );
 });
+
+// 取得角色
+app.post("/role/list", function async (req, res) {
+    db.query(
+        `SELECT * FROM role `,
+        function (err, roleRows, fields) {
+            const response = apiResponse(20000, roleRows);
+            return res.send(response);
+        }
+    );
+});
+
+// 建立使用者
+app.post("/user/create", function async (req, res) {
+    const body = req.body;
+    body.FUserId = _uuid();
+    db.query('INSERT INTO user SET ?', body, function (error, results, fields) {
+        if (error) throw error;
+        else {
+            delete body.FAccount;
+            delete body.FPassword;
+            return res.send({
+                code: 20000,
+                data: [body]
+            })
+        }
+    });
+});
+
+// 產生 UUID
+function _uuid() {
+    var d = Date.now();
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        d += performance.now();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
