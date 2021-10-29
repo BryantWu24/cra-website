@@ -41,6 +41,7 @@ import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
 import Bakery from '../Bakery/Bakery';
 import BakeryManage from '../BakeryManage/BakeryManage';
+import Database from '../Database/Database';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -80,6 +81,7 @@ const styles = (theme) => ({
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
 class Backend extends Component {
     constructor(props) {
         super(props);
@@ -162,6 +164,7 @@ class Backend extends Component {
             await this.setListItem();
         }
     }
+
     // 設定目錄
     setListItem = async () => {
         const listItem = [];
@@ -184,12 +187,14 @@ class Backend extends Component {
             listItem, currentPage
         })
     }
+
     // 點擊目錄
     clickListItem = (page) => {
         this.setState({
             currentPage: page
         })
     }
+
     // 路由渲染
     renderSwitch = () => {
         switch (this.state.currentPage) {
@@ -201,10 +206,13 @@ class Backend extends Component {
                 return <Bakery />
             case 'BAKERY MANAGE':
                 return <BakeryManage />
+            case 'DATABASE':
+                return <Database />
             default:
                 return <Home />;
         }
     }
+
     // 顯示 Dialog
     showDialog = async (mode) => {
         switch (mode) {
@@ -288,6 +296,7 @@ class Backend extends Component {
                 break;
         }
     }
+
     // 關閉 Dialog
     closeDialog = (mode) => {
         const state = {};
@@ -306,6 +315,7 @@ class Backend extends Component {
         }
         this.setState(state);
     }
+
     // 登出
     doLogOut = async () => {
         await this.setState(
@@ -327,6 +337,7 @@ class Backend extends Component {
         this.setListItem();
 
     }
+
     // 顯示通知框
     showSnackbar = async (severity, msg) => {
         await this.setState({
@@ -335,6 +346,7 @@ class Backend extends Component {
             isSnackbarOpen: true
         })
     }
+
     // 登入
     doLogIn = async () => {
         const loginField = ['account', 'password'];
@@ -378,6 +390,7 @@ class Backend extends Component {
         } else this.showSnackbar('error', '請填寫正確的資料');
         this.setListItem();
     }
+
     // 註冊
     doSignUp = async () => {
         const signField = ['name', 'phone', 'gender', 'account', 'email', 'password'];
@@ -422,6 +435,7 @@ class Backend extends Component {
                 .catch((e) => { this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。'); });
         } else this.showSnackbar('error', '請填寫正確的資料');
     }
+
     // 驗證欄位
     // 當欄位為字串會直接寫入 state ；否則回傳結果
     verify(mode, curInfo, field) {
@@ -446,42 +460,49 @@ class Backend extends Component {
             return result;
         }
     }
+
     // 註冊：使用者名稱
     handleSignName($event) {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.name = $event.target.value;
         this.verify('sign', curSingInfo, 'name')
     }
+
     // 註冊：電話/手機
     handleSignPhone($event) {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.phone = $event.target.value;
         this.verify('sign', curSingInfo, 'phone')
     }
+
     // 註冊：性別
     handleSignGender($event) {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.gender = $event.target.value;
         this.verify('sign', curSingInfo, 'gender')
     }
+
     // 註冊：帳號
     handleSignAccount($event) {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.account = $event.target.value;
         this.verify('sign', curSingInfo, 'account')
     }
+
     // 註冊：密碼
     handleSignPassword($event) {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.password = $event.target.value;
         this.verify('sign', curSingInfo, 'password')
     }
+
     // 註冊：信箱
     handleSignEmail($event) {
         const curSingInfo = Object.assign({}, this.state.signInfo);
         curSingInfo.email = $event.target.value;
         this.verify('sign', curSingInfo, 'email')
     }
+
     // 註冊：功能勾選框
     handleFunctionChange($event) {
         const functionGroup = this.state.signInfo.function;
@@ -492,18 +513,21 @@ class Backend extends Component {
             signInfo
         })
     }
+
     // 登入：帳號
     handleLoginAccount($event) {
         const curLoginInfo = Object.assign({}, this.state.loginInfo);
         curLoginInfo.account = $event.target.value;
         this.verify('login', curLoginInfo, 'account')
     }
+
     // 登入：密碼
     handleLoginPassword($event) {
         const curLoginInfo = Object.assign({}, this.state.loginInfo);
         curLoginInfo.password = $event.target.value;
         this.verify('login', curLoginInfo, 'password')
     }
+
     // 通知框開關
     handleSnackbarState(state) {
         switch (state) {
@@ -521,6 +545,7 @@ class Backend extends Component {
                 break;
         }
     }
+
     render() {
         const { classes } = this.props;
         const toggleDrawer = (isDrawerOpen) => (event) => {

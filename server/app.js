@@ -20,7 +20,6 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
-
 app.listen(port, () => {
     console.log(`RUN http://localhost:${port}`);
 });
@@ -73,15 +72,33 @@ app.post("/login", function async (req, res) {
     );
 });
 
+// 查整張表
+const querySelectList = (tableName, resFunction) => {
+    const res = db.query(`SELECT * FROM ${tableName}`, function (err, rows, fields) {
+        const response = apiResponse(20000, rows);
+        return resFunction.send(response);
+    });
+    return res;
+};
+
+// 取得使用者
+app.post("/user/list", function async (req, res) {
+    querySelectList('user', res);
+})
+
 // 取得角色
 app.post("/role/list", function async (req, res) {
-    db.query(
-        `SELECT * FROM role `,
-        function (err, roleRows, fields) {
-            const response = apiResponse(20000, roleRows);
-            return res.send(response);
-        }
-    );
+    querySelectList('role', res);
+});
+
+// 取得角色與目錄的 mapping 表
+app.post("/auth/list", function async (req, res) {
+    querySelectList('auth', res);
+});
+
+// 取得目錄
+app.post("/list/list", function async (req, res) {
+    querySelectList('list', res);
 });
 
 // 建立使用者
