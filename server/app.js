@@ -85,6 +85,10 @@ const querySelectList = (tableName, resFunction) => {
 app.post("/user/list", function async (req, res) {
     querySelectList('user', res);
 })
+// 取得麵包坊原料
+app.post("/bakery/material/list", function async (req, res) {
+    querySelectList('bakery_material', res);
+})
 
 // 取得角色
 app.post("/role/list", function async (req, res) {

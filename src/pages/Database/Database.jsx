@@ -13,7 +13,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const tabHeader = ["User", "Auth", "Role", "List"];
+const tabHeader = ["User", "Auth", "Role", "List","Bakery_Material"];
 
 class Database extends Component {
     constructor() {
@@ -57,6 +57,9 @@ class Database extends Component {
                 break;
             case '3':
                 this.getTableData('list');
+                break;
+            case '4':
+                this.getTableData('bakery/material');
                 break;
             default:
                 break;

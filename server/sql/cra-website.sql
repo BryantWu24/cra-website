@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-10-29 11:38:20
+-- 產生時間： 2021-10-29 13:04:51
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -49,6 +49,17 @@ INSERT INTO `auth` (`FAuthId`, `FRoleId`, `FRoleName`, `FListId`, `FListKey`, `F
 ('966be30f-1bc5-40f6-8915-3f86ced797f7', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'Administrator', '63d3834a-9814-45e2-8995-a11512bbc608', 'Dashboard', '儀錶板'),
 ('11717fc0-4cde-4a1a-bfbc-0a56c04b358a', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'Administrator', 'ac03a4ab-8432-402a-8bde-449a2e276303', 'Tool', '工具區'),
 ('7d67a76b-8674-43eb-8e77-f92da5ebe847', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'Administrator', 'c2f3dafe-46bf-4a72-9f7c-d3eac8120e41', 'Database', '資料庫管理');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bakery_material`
+--
+
+CREATE TABLE `bakery_material` (
+  `FBakeryMaterialId` varchar(36) NOT NULL,
+  `FName` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
