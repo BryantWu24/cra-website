@@ -8,6 +8,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
+import {Config} from '../../core/config'
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -96,7 +97,7 @@ class Database extends Component {
 
     // 取得資料表
     getTableData = async (tableName) => {
-        const url = "http://localhost:7000/" + tableName + "/list";
+        const url = Config.apiUrl + "/" + tableName + "/list";
         await axios
             .post(url)
             .then((res) => {

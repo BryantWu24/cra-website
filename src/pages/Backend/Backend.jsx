@@ -45,6 +45,7 @@ import Database from '../Database/Database';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import {Config} from '../../core/config'
 
 const styles = (theme) => ({
     root: {
@@ -357,7 +358,7 @@ class Backend extends Component {
 
         if (!hasError) {
             await axios
-                .post("http://localhost:7000/login", {
+                .post(Config.apiUrl + "/login", {
                     account: this.state.loginInfo.account,
                     password: this.state.loginInfo.password,
                 })
@@ -401,7 +402,7 @@ class Backend extends Component {
         const hasError = signErrField.some(item => result.signInfo[item] !== '');
         if (!hasError) {
             await axios
-                .post("http://localhost:7000/user/create", {
+                .post(Config.apiUrl + "/user/create", {
                     FUserName: this.state.signInfo.name,
                     FEmail: this.state.signInfo.email,
                     FRoleId: '08292820-6f86-4566-bbb2-af267187ab1b', // BakeryUser
