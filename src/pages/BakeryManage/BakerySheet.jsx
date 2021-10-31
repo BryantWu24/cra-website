@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
-import { Grid, Box, FormControl, InputLabel, Select, Button, TextField, Chip } from '@mui/material';
+import {
+    Grid, Box, FormControl, InputLabel, Select, Button, Chip,
+    TextField,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-
+import AddIcon from '@mui/icons-material/Add';
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -42,11 +49,17 @@ class BakerySheet extends Component {
                 storageDays: '',
                 storageMethod: ''
             },
+            addMaterialInfo: {
+                name: '',
+                err_name: ''
+            },
+            isAddMaterialClicked: false,
             mode: 'create',
             hasDoSave: false,
             materialData: [],
             isSnackbarOpen: false,
-            snackbarMsg: ''
+            snackbarMsg: '',
+            isShowAddMaterialDialog: false
         }
         this.doSave = this.doSave.bind(this);
         this.handleMateriaChange = this.handleMateriaChange.bind(this);
@@ -81,8 +94,13 @@ class BakerySheet extends Component {
 
     // 取得成分資料
     getMaterialData = () => {
-        const materialData = ['麵粉', '奶油', '糖粉', '鮮奶','無鹽奶油','水','糖霜','花生'];
+        const materialData = ['麵粉', '奶油', '糖粉', '鮮奶', '無鹽奶油', '水', '糖霜', '花生'];
         this.setState({ materialData })
+    }
+
+    // 新建組成成分
+    doAddMaterial = () =>{
+
     }
 
     // 儲存
@@ -99,6 +117,25 @@ class BakerySheet extends Component {
         if (Object.values(errorData).some(item => item.length !== 0)) this.showSnackbar('error', '儲存失敗')
         else this.showSnackbar('success', '儲存成功')
 
+    }
+
+
+    handleAddMaterialChange = ($event) => {
+        const addMaterialInfo = this.state.addMaterialInfo;
+        if (!!this.state.isAddMaterialClicked && addMaterialInfo.name.trim().length === 0) addMaterialInfo.err_name = '此欄位為必填欄位';
+        else addMaterialInfo.err_name = '';
+        addMaterialInfo.name = $event.target.value;
+
+
+        this.setState({ addMaterialInfo })
+    }
+
+    // 新增成分 Dialog 開關
+    switchAddMaterialDialog = (status) => {
+        this.setState({
+            isShowAddMaterialDialog: status,
+            isAddMaterialClicked: false,
+        })
     }
 
     // 驗證
@@ -259,7 +296,7 @@ class BakerySheet extends Component {
                         error={(this.state.errorData?.storageMethod?.length > 0 && !!this.state.hasDoSave)} />
                     <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.storageMethod}</div>
                 </Grid >
-                <Grid item xs={12} sm={12} md={12} lg={12}>
+                <Grid item xs={12} sm={9} md={10} lg={10}>
                     <FormControl sx={{ width: '100%' }}>
                         <InputLabel id="demo-multiple-chip-label">組成成分</InputLabel>
                         <Select
@@ -294,6 +331,18 @@ class BakerySheet extends Component {
                     </FormControl>
                     <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.ingredients}</div>
                 </Grid >
+                <Grid item xs={12} sm={3} md={2} lg={2}>
+                    <div style={{ width: '100%', height: '100%', justifyContent: 'flex-end', display: 'flex', alignItems: 'center' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<AddIcon />}
+                            onClick={() => { this.switchAddMaterialDialog(true) }}
+                            fullWidth
+                        >
+                            新增成分
+                        </Button>
+                    </div>
+                </Grid >
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                     <div style={{ width: '100%', justifyContent: 'flex-end', display: 'flex' }}>
                         <Button
@@ -304,6 +353,37 @@ class BakerySheet extends Component {
                         </Button>
                     </div>
                 </Grid >
+                {/* 新增成分 Dialog */}
+                <Dialog open={this.state.isShowAddMaterialDialog} disableEscapeKeyDown id="add-material-dialog">
+                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >新增成分</DialogTitle>
+                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="material"
+                            label="成分名稱"
+                            type="text"
+                            fullWidth
+                            variant="standard"
+                            color="secondary"
+                            onChange={this.handleAddMaterialChange}
+                            value={this.state.addMaterialInfo.name}
+                            helperText={this.state.addMaterialInfo.err_name}
+                            error={(this.state.addMaterialInfo?.err_name?.length > 0 && !!this.state.isAddMaterialClicked)}
+                        />
+                    </DialogContent>
+                    <DialogActions style={{ background: '#959595' }} >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <div>
+                                <Button color="secondary" onClick={() => { this.switchAddMaterialDialog(false) }} >取消</Button>
+                            </div>
+                            
+                            <div>
+                                <Button color="secondary" onClick={this.doAddMaterial} >建立</Button>
+                            </div>
+                        </div>
+                    </DialogActions>
+                </Dialog>
             </Grid >
         );
     }
