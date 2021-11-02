@@ -13,6 +13,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import AddIcon from '@mui/icons-material/Add';
+import axios from 'axios';
+import { Config } from '../../core/config';
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -89,18 +91,58 @@ class BakerySheet extends Component {
             errorData,
             hasDoSave: false
         })
-        this.getMaterialData();
+        this.getMaterial();
     }
-
-    // 取得成分資料
-    getMaterialData = () => {
-        const materialData = ['麵粉', '奶油', '糖粉', '鮮奶', '無鹽奶油', '水', '糖霜', '花生'];
-        this.setState({ materialData })
-    }
-
     // 新建組成成分
-    doAddMaterial = () =>{
+    doAddMaterial = async () => {
+        const addMaterialInfo = this.state.addMaterialInfo;
+        if (addMaterialInfo.name.trim().length > 0) {
+            await axios
+                .post(Config.apiUrl + "/bakery/material/create", {
+                    FName: addMaterialInfo.name.trim(),
+                })
+                .then((res) => {
+                    if (!!res.data) {
+                        switch (res.data.code.toString()) {
+                            case '20000':
+                                console.log('bakery material create :', res.data);
+                                this.showSnackbar('success', '新增組成成分成功');
+                                this.getMaterial();
+                                this.switchAddMaterialDialog(false);
+                                break;
+                            case '20001':
+                                console.log('bakery material create :', res.data);
+                                this.showSnackbar('error', res.data.message);
+                                break;
+                            default:
+                                break;
+                        }
+                    } else this.showSnackbar('error', '新增成分發生異常，請稍後再嘗試。');
+                })
+                .catch((e) => { this.showSnackbar('error', '新增成分發生異常，請稍後再嘗試。'); });
+        } else this.showSnackbar('error', '請填寫正確的資料');
+    }
 
+    // 取得組成成分
+    getMaterial = async () => {
+        await axios
+            .post(Config.apiUrl + "/bakery/material/list")
+            .then((res) => {
+                if (!!res.data) {
+                    switch (res.data.code.toString()) {
+                        case '20000':
+                            console.log('bakery material list :', res.data);
+                            this.setState({
+                                materialData: res.data.data
+                            })
+
+                            break;
+                        default:
+                            break;
+                    }
+                } else this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。');
+            })
+            .catch((e) => { this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。'); });
     }
 
     // 儲存
@@ -119,14 +161,12 @@ class BakerySheet extends Component {
 
     }
 
-
+    // handle 新建組成成分輸入框
     handleAddMaterialChange = ($event) => {
         const addMaterialInfo = this.state.addMaterialInfo;
         if (!!this.state.isAddMaterialClicked && addMaterialInfo.name.trim().length === 0) addMaterialInfo.err_name = '此欄位為必填欄位';
         else addMaterialInfo.err_name = '';
         addMaterialInfo.name = $event.target.value;
-
-
         this.setState({ addMaterialInfo })
     }
 
@@ -135,6 +175,10 @@ class BakerySheet extends Component {
         this.setState({
             isShowAddMaterialDialog: status,
             isAddMaterialClicked: false,
+            addMaterialInfo: {
+                name: '',
+                err_name: ''
+            },
         })
     }
 
@@ -176,7 +220,7 @@ class BakerySheet extends Component {
         await this.setState({ errorData })
     }
 
-    // handle 輸入框
+    // handle 表單輸入框
     handleChange = async (key, $event) => {
         let value = $event.target.value;
         const data = this.state.data;
@@ -319,12 +363,12 @@ class BakerySheet extends Component {
                             MenuProps={MenuProps}
                             error={(this.state.errorData?.ingredients?.length > 0 && !!this.state.hasDoSave)}
                         >
-                            {this.state.materialData.map((name) => (
+                            {this.state.materialData.map((item) => (
                                 <MenuItem
-                                    key={name}
-                                    value={name}
+                                    key={item.FBakeryMaterialId}
+                                    value={item.FName}
                                 >
-                                    {name}
+                                    {item.FName}
                                 </MenuItem>
                             ))}
                         </Select>
@@ -377,7 +421,7 @@ class BakerySheet extends Component {
                             <div>
                                 <Button color="secondary" onClick={() => { this.switchAddMaterialDialog(false) }} >取消</Button>
                             </div>
-                            
+
                             <div>
                                 <Button color="secondary" onClick={this.doAddMaterial} >建立</Button>
                             </div>

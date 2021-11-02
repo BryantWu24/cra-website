@@ -122,6 +122,36 @@ app.post("/user/create", function async (req, res) {
     });
 });
 
+
+// 建立成分
+app.post("/bakery/material/create", function async (req, res) {
+    const body = req.body;
+    body.FBakeryMaterialId = _uuid();
+
+    db.query(`SELECT * from bakery_material WHERE FName = '${body.FName}'`, function (err, rows, field) {
+        console.log('tttt:', rows);
+        if (rows.length === 0) {
+            db.query('INSERT INTO bakery_material SET ?', body, function (error, results, fields) {
+                if (error) throw error;
+                else {
+                    return res.send({
+                        code: 20000,
+                        data: [body]
+                    })
+                }
+            });
+        } else {
+            return res.send({
+                code: 20001,
+                message: '此成分已被建立'
+            })
+        }
+    })
+
+
+});
+
+
 // 產生 UUID
 function _uuid() {
     var d = Date.now();
