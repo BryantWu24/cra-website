@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-10-29 13:04:51
+-- 產生時間： 2021-11-02 11:23:06
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -53,6 +53,53 @@ INSERT INTO `auth` (`FAuthId`, `FRoleId`, `FRoleName`, `FListId`, `FListKey`, `F
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `bakery_ingredients`
+--
+
+CREATE TABLE `bakery_ingredients` (
+  `FBakeryIngredientId` varchar(36) NOT NULL,
+  `FBakeryMaterialId` varchar(36) NOT NULL,
+  `FBakeryMaterialName` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `bakery_ingredients`
+--
+
+INSERT INTO `bakery_ingredients` (`FBakeryIngredientId`, `FBakeryMaterialId`, `FBakeryMaterialName`) VALUES
+('21f3d54c-9b33-41d5-9a62-fe143f5ee8f3', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('21f3d54c-9b33-41d5-9a62-fe143f5ee8f3', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('21f3d54c-9b33-41d5-9a62-fe143f5ee8f3', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('5d445843-2654-428e-bcd3-0d28befa7a39', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('5d445843-2654-428e-bcd3-0d28befa7a39', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('5d445843-2654-428e-bcd3-0d28befa7a39', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bakery_item`
+--
+
+CREATE TABLE `bakery_item` (
+  `FBakeryItemId` varchar(36) NOT NULL,
+  `FName` varchar(30) NOT NULL,
+  `FUnitPrice` int(100) NOT NULL,
+  `FStorageCount` int(100) NOT NULL,
+  `FStorageDays` int(100) NOT NULL,
+  `FStorageMethod` varchar(300) NOT NULL,
+  `FBakeryIngredientId` varchar(36) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `bakery_item`
+--
+
+INSERT INTO `bakery_item` (`FBakeryItemId`, `FName`, `FUnitPrice`, `FStorageCount`, `FStorageDays`, `FStorageMethod`, `FBakeryIngredientId`) VALUES
+('adc94e75-d7c1-40c1-af6e-bf2cd9605a0c', '123', 123, 1, 1, '123', '5d445843-2654-428e-bcd3-0d28befa7a39');
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `bakery_material`
 --
 
@@ -60,6 +107,17 @@ CREATE TABLE `bakery_material` (
   `FBakeryMaterialId` varchar(36) NOT NULL,
   `FName` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `bakery_material`
+--
+
+INSERT INTO `bakery_material` (`FBakeryMaterialId`, `FName`) VALUES
+('7299b5ba-439a-494a-9c07-99d46e9d47e3', '細砂糖'),
+('680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶');
 
 -- --------------------------------------------------------
 

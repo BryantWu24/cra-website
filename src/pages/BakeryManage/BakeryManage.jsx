@@ -6,6 +6,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { Grid, Button } from '@mui/material';
 import BakerySheet from './BakerySheet';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import axios from 'axios';
+import { Config } from '../../core/config'
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 class BakeryManage extends Component {
     constructor(props) {
@@ -25,7 +33,7 @@ class BakeryManage extends Component {
     }
 
     componentDidMount = () => {
-        this.getData();
+        this.getBakeryItem();
     }
 
     showList = async () => {
@@ -33,8 +41,51 @@ class BakeryManage extends Component {
             mode: 'list',
             title: '商品清單'
         })
-        await this.getData();
+        await this.getBakeryItem();
+    }
 
+    // 顯示通知框
+    showSnackbar = async (severity, msg) => {
+        await this.setState({
+            snackbarMsg: msg,
+            alertSeverity: severity,
+            isSnackbarOpen: true
+        })
+    }
+
+    // 取得商品清單
+    getBakeryItem = async () => {
+        await axios
+            .post(Config.apiUrl + "/bakery/item/list")
+            .then((res) => {
+                if (!!res.data) {
+                    switch (res.data.code.toString()) {
+                        case '20000':
+                            console.log('bakery item list :', res.data);
+                            const data = res.data.data;
+                            const tableData = []
+                            data.forEach((item, index) => {
+                                tableData.push({
+                                    productName: '麵包一',
+                                    unitPrice: item.FUnitPrice,
+                                    storageCount: item.FStorageCount,
+                                    ingredients: ['1', '2', '3', '4', '5', '6'],
+                                    storageDays: item.FStorageDays,
+                                    storageMethod: item.FStorageMethod,
+                                    id: index
+                                })
+                            })
+                            this.setState({
+                                data: tableData
+                            })
+
+                            break;
+                        default:
+                            break;
+                    }
+                } else this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。');
+            })
+            .catch((e) => { this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。'); });
     }
 
     // 編輯
@@ -51,8 +102,8 @@ class BakeryManage extends Component {
         this.setState({
             mode: 'create',
             title: '新增商品',
-            selectItemData:[],
-            selectItemId:[]
+            selectItemData: [],
+            selectItemId: []
         })
     }
 
@@ -61,7 +112,7 @@ class BakeryManage extends Component {
         if (this.state.selectItemData.length === 0 || this.state.selectItemId.length === 0)
             alert('請選擇一筆')
 
-        this.getData();
+        this.getBakeryItem();
     }
 
     // handle 勾選
@@ -161,6 +212,20 @@ class BakeryManage extends Component {
 
         return (
             <Grid container>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                    open={this.state.isSnackbarOpen}
+                    autoHideDuration={5000}
+                    onClose={() => { this.handleSnackbarState('close') }}
+                    key={'top center'}
+                >
+                    <Alert onClose={() => { this.handleSnackbarState('close') }} severity={this.state.alertSeverity} sx={{ width: '100%' }}>
+                        {this.state.snackbarMsg}
+                    </Alert>
+                </Snackbar>
                 <Grid item xs={12}>
                     Bakery 後臺管理系統 - {this.state.title}
                 </Grid>

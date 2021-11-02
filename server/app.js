@@ -89,6 +89,27 @@ app.post("/user/list", function async (req, res) {
 app.post("/bakery/material/list", function async (req, res) {
     querySelectList('bakery_material', res);
 })
+// 取得麵包坊列表
+// app.post("/bakery/item/list", function async (req, res) {
+//     db.query(`SELECT * FROM bakery_item`, function async (err, itemRows, fields) {
+        
+//         const response =  itemRows.map((item) => {
+//             const ingredients = []
+//             db.query(`SELECT * FROM bakery_ingredients WHERE FBakeryIngredientId = '${item.FBakeryIngredientId}'`, function async (err, ingredientRows, fields) {
+//                 ingredientRows.forEach((item) => {
+//                     ingredients.push(item.FBakeryMaterialName);
+//                 })
+//             });
+//             console.log('ingredients:',ingredients)
+//             item.ingredients = ingredients;
+//             return item;
+//         })
+
+//         const finalResponse = apiResponse(20000, response);
+//         console.log('finalResponse:',finalResponse);
+//         res.send(finalResponse);
+//     });
+// })
 
 // 取得角色
 app.post("/role/list", function async (req, res) {
