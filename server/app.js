@@ -129,7 +129,6 @@ app.post("/bakery/material/create", function async (req, res) {
     body.FBakeryMaterialId = _uuid();
 
     db.query(`SELECT * from bakery_material WHERE FName = '${body.FName}'`, function (err, rows, field) {
-        console.log('tttt:', rows);
         if (rows.length === 0) {
             db.query('INSERT INTO bakery_material SET ?', body, function (error, results, fields) {
                 if (error) throw error;
@@ -147,10 +146,52 @@ app.post("/bakery/material/create", function async (req, res) {
             })
         }
     })
-
-
 });
 
+// 建立商品
+app.post("/bakery/item/create", function async (req, res) {
+    const body = req.body;
+    const FBakeryIngredientId = _uuid();
+    let materialSelectSQL = `SELECT * from bakery_material WHERE `;
+    body.FIngredients.forEach((item, index) => {
+        if (index === 0) materialSelectSQL += `FName = '${item}'`;
+        else materialSelectSQL += ` OR FName = '${item}'`
+    })
+
+    db.query(materialSelectSQL, function (err, rows, field) {
+        rows.forEach((item) => {
+            const ingredientsBody = {
+                FBakeryIngredientId,
+                FBakeryMaterialId: item.FBakeryMaterialId,
+                FBakeryMaterialName: item.FName
+            };
+            db.query('INSERT INTO bakery_ingredients SET ?', ingredientsBody, function (error, results, fields) {
+                if (error) throw error;
+                else {}
+            });
+        })
+    })
+
+    const itemBody = {
+        FBakeryItemId: _uuid(),
+        FBakeryIngredientId,
+        FName: body.FName,
+        FUnitPrice: body.FUnitPrice,
+        FStorageCount: body.FStorageCount,
+        FStorageDays: body.FStorageDays,
+        FStorageMethod: body.FStorageMethod,
+    }
+    db.query('INSERT INTO bakery_item SET ?', itemBody, function (error, results, fields) {
+        if (error) throw error;
+        else {
+            return res.send({
+                code: 20000,
+                data: [body]
+            })
+        }
+    });
+
+});
 
 // 產生 UUID
 function _uuid() {

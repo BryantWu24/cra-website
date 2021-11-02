@@ -146,7 +146,7 @@ class BakerySheet extends Component {
     }
 
     // 儲存
-    doSave = () => {
+    doSave = async () => {
         console.log('onSave:', this.state.data)
         if (!this.state.hasDoSave) {
             this.setState({
@@ -157,7 +157,36 @@ class BakerySheet extends Component {
         this.doVerify();
         const errorData = this.state.errorData;
         if (Object.values(errorData).some(item => item.length !== 0)) this.showSnackbar('error', '儲存失敗')
-        else this.showSnackbar('success', '儲存成功')
+        else {
+            const itemData = this.state.data;
+            const request = {};
+            request.FName = itemData.productName;
+            request.FUnitPrice = itemData.unitPrice;
+            request.FStorageCount = itemData.storageCount;
+            request.FStorageDays = itemData.storageDays;
+            request.FStorageMethod = itemData.storageMethod;
+            request.FIngredients = itemData.ingredients;
+
+            await axios
+                .post(Config.apiUrl + "/bakery/item/create", request)
+                .then((res) => {
+                    if (!!res.data) {
+                        switch (res.data.code.toString()) {
+                            case '20000':
+                                console.log('bakery material create :', res.data);
+                                this.showSnackbar('success', '新增產品成功');
+                                break;
+                            case '20001':
+                                console.log('bakery material create :', res.data);
+                                this.showSnackbar('error', res.data.message);
+                                break;
+                            default:
+                                break;
+                        }
+                    } else this.showSnackbar('error', '新增產品發生異常，請稍後再嘗試。');
+                })
+                .catch((e) => { this.showSnackbar('error', '新增產品發生異常，請稍後再嘗試。'); });
+        }
 
     }
 
