@@ -22,8 +22,6 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`RUN http://localhost:${port}`);
-
-
 });
 
 const apiResponse = (code, data, message) => {
@@ -186,7 +184,6 @@ function deleteBakeryItem(FBakeryItemId) {
 // 刪除產品
 app.post("/bakery/item/delete", function async (req, res) {
     const body = req.body;
-    console.log('body:',body);
     // 通過async/await去操作得到的Promise對象
     (async function () {
         const queryPromise = Promise.resolve();

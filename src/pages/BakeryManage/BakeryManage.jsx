@@ -36,19 +36,13 @@ class BakeryManage extends Component {
 
 
     showList = async () => {
-
-        await this.getBakeryItem();
-        await this.setListState();
-
-    }
-
-    setListState = async () => {
-        await this.setState({
+        this.setState({
             mode: 'list',
             title: '商品清單',
             selectItemId: [],
             selectItemData: [],
         })
+        this.getBakeryItem();
     }
 
     // 顯示通知框
@@ -58,24 +52,6 @@ class BakeryManage extends Component {
             alertSeverity: severity,
             isSnackbarOpen: true
         })
-    }
-
-    // 通知框開關
-    handleSnackbarState(state) {
-        switch (state) {
-            case 'close':
-                this.setState({
-                    isSnackbarOpen: false
-                })
-                break;
-            case 'open':
-                this.setState({
-                    isSnackbarOpen: true
-                })
-                break;
-            default:
-                break;
-        }
     }
 
     // 取得商品清單
@@ -112,6 +88,23 @@ class BakeryManage extends Component {
                 } else this.showSnackbar('error', '取得商品清單發生異常，請稍後再嘗試。');
             })
             .catch((e) => { this.showSnackbar('error', '取得商品清單發生異常，請稍後再嘗試。'); });
+    }
+    // 通知框開關
+    handleSnackbarState(state) {
+        switch (state) {
+            case 'close':
+                this.setState({
+                    isSnackbarOpen: false
+                })
+                break;
+            case 'open':
+                this.setState({
+                    isSnackbarOpen: true
+                })
+                break;
+            default:
+                break;
+        }
     }
 
     // 編輯
@@ -153,6 +146,10 @@ class BakeryManage extends Component {
                                 console.log('bakery item list :', res.data);
                                 this.showSnackbar('success', '刪除成功');
                                 this.getBakeryItem();
+                                this.setState({
+                                    selectItemData: [],
+                                    selectItemId: []
+                                })
                                 break;
                             default:
                                 break;
@@ -267,6 +264,7 @@ class BakeryManage extends Component {
                                     checkboxSelection
                                     onRowClick={this.handleRowClick}
                                     onSelectionModelChange={this.handleSelect}
+                                    selectionModel={this.state.selectItemId} 
                                 />
                             </div>
                         </Grid>
