@@ -53,7 +53,7 @@ app.post("/login", function async (req, res) {
         `SELECT * FROM user WHERE FAccount='${account}' AND FPassword='${password}'`,
         function (err, userRows, fields) {
             if (userRows.length === 0) {
-                const noDataResponse = apiResponse(20001, '帳號密碼輸入錯誤');
+                const noDataResponse = apiResponse(20001, [], '帳號密碼輸入錯誤');
                 return res.send(noDataResponse);
             } else {
                 db.query(
@@ -67,7 +67,7 @@ app.post("/login", function async (req, res) {
                             });
                         });
                         userRows[0].list = listAry;
-                        const response = apiResponse(20000, userRows);
+                        const response = apiResponse(20000, userRows, '登入成功');
                         return res.send(response);
                     }
                 )
@@ -79,7 +79,7 @@ app.post("/login", function async (req, res) {
 // 查整張表
 const querySelectList = (tableName, resFunction) => {
     const res = db.query(`SELECT * FROM ${tableName}`, function (err, rows, fields) {
-        const response = apiResponse(20000, rows);
+        const response = apiResponse(20000, rows,'查詢成功');
         return resFunction.send(response);
     });
     return res;
@@ -172,6 +172,46 @@ app.post("/user/create", function async (req, res) {
         }
     });
 });
+
+// 刪除產品 SQL
+function deleteBakeryItem(FBakeryItemId) {
+    return new Promise((resolve, reject) => {
+        db.query(`DELETE FROM  bakery_item WHERE FBakeryItemId='${FBakeryItemId}'`, function (error, fields) {
+            if (error) reject(error);
+            else resolve();
+        });
+    });
+}
+
+// 刪除產品
+app.post("/bakery/item/delete", function async (req, res) {
+    const body = req.body;
+    console.log('body:',body);
+    // 通過async/await去操作得到的Promise對象
+    (async function () {
+        const queryPromise = Promise.resolve();
+        queryPromise.then(() => {
+            const deleteBakeryItemAry = body.map(async (item) => {
+                const deleteBakeryItemQuery = await deleteBakeryItem(item.FBakeryItemId);
+                return deleteBakeryItemQuery;
+            })
+
+            const deleteBakeryIngredientAry = body.map(async (item) => {
+                const deleteBakeryIngredientQuery = await deleteIngredients(item.FBakeryIngredientId);
+                return deleteBakeryIngredientQuery;
+            })
+
+            Promise.all(deleteBakeryItemAry).then(() => {
+                Promise.all(deleteBakeryIngredientAry).then(() => {
+                    const finalResponse = apiResponse(20000, [],'刪除成功');
+                    res.send(finalResponse)
+                })
+            })
+        })
+
+    })()
+})
+
 // 更新產品
 app.post("/bakery/item/update", function async (req, res) {
     const body = req.body;
@@ -268,7 +308,7 @@ app.post("/bakery/item/update", function async (req, res) {
                         // 通過async/await去操作得到的Promise對象
                         (async function () {
                             const deletePromiseAry = action.insert.map(async (item) => {
-                                const deletePromise = await deleteIngredients(item.FBakeryMaterialId, body.FBakeryIngredientId);
+                                const deletePromise = await deleteIngredients(body.FBakeryIngredientId, item.FBakeryMaterialId);
                                 return deletePromise;
                             })
 
@@ -286,7 +326,7 @@ app.post("/bakery/item/update", function async (req, res) {
         if (action.delete.length > 0) {
             (async function () {
                 const deletePromiseAry = action.delete.map(async (item) => {
-                    const deletePromise = await deleteIngredients(item.FBakeryMaterialId, body.FBakeryIngredientId);
+                    const deletePromise = await deleteIngredients(body.FBakeryIngredientId, item.FBakeryMaterialId);
                     return deletePromise;
                 })
 
@@ -300,13 +340,26 @@ app.post("/bakery/item/update", function async (req, res) {
 });
 
 // 刪除成分
-function deleteIngredients(FBakeryMaterialId, FBakeryIngredientId) {
-    return new Promise((resolve, reject) => {
-        db.query(`DELETE FROM  bakery_ingredients WHERE FBakeryMaterialId='${FBakeryMaterialId}' AND  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (error, fields) {
-            if (error) reject(error);
-            else resolve();
-        });
-    });
+function deleteIngredients(FBakeryIngredientId, FBakeryMaterialId) {
+    if (!!FBakeryIngredientId) {
+        if (!!FBakeryMaterialId) {
+            return new Promise((resolve, reject) => {
+                db.query(`DELETE FROM  bakery_ingredients WHERE FBakeryMaterialId='${FBakeryMaterialId}' AND  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (error, fields) {
+                    if (error) reject(error);
+                    else resolve();
+                });
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                db.query(`DELETE FROM  bakery_ingredients WHERE  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (error, fields) {
+                    if (error) reject(error);
+                    else resolve();
+                });
+            });
+        }
+    } else {
+        console.log('刪除成分異常')
+    }
 }
 
 // 新增成分

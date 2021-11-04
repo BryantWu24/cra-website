@@ -36,11 +36,19 @@ class BakeryManage extends Component {
 
 
     showList = async () => {
+
+        await this.getBakeryItem();
+        await this.setListState();
+
+    }
+
+    setListState = async () => {
         await this.setState({
             mode: 'list',
-            title: '商品清單'
+            title: '商品清單',
+            selectItemId: [],
+            selectItemData: [],
         })
-        await this.getBakeryItem();
     }
 
     // 顯示通知框
@@ -50,6 +58,24 @@ class BakeryManage extends Component {
             alertSeverity: severity,
             isSnackbarOpen: true
         })
+    }
+
+    // 通知框開關
+    handleSnackbarState(state) {
+        switch (state) {
+            case 'close':
+                this.setState({
+                    isSnackbarOpen: false
+                })
+                break;
+            case 'open':
+                this.setState({
+                    isSnackbarOpen: true
+                })
+                break;
+            default:
+                break;
+        }
     }
 
     // 取得商品清單
@@ -65,7 +91,7 @@ class BakeryManage extends Component {
                             const tableData = []
                             data.forEach((item, index) => {
                                 tableData.push({
-                                    productName: '麵包一',
+                                    productName: item.FName,
                                     unitPrice: item.FUnitPrice,
                                     storageCount: item.FStorageCount,
                                     ingredients: item.ingredients,
@@ -79,7 +105,6 @@ class BakeryManage extends Component {
                             this.setState({
                                 data: tableData
                             })
-
                             break;
                         default:
                             break;
@@ -109,11 +134,32 @@ class BakeryManage extends Component {
     }
 
     // 刪除
-    doDelete = () => {
+    doDelete = async () => {
         if (this.state.selectItemData.length === 0 || this.state.selectItemId.length === 0)
             this.showSnackbar('error', '請至少選擇一筆');
+        else {
+            const body = this.state.selectItemData.map((item) => {
+                return {
+                    FBakeryIngredientId: item.FBakeryIngredientId,
+                    FBakeryItemId: item.FBakeryItemId
+                }
+            })
 
-        this.getBakeryItem();
+            axios.post(Config.apiUrl + "/bakery/item/delete", body)
+                .then((res) => {
+                    if (!!res.data) {
+                        switch (res.data.code.toString()) {
+                            case '20000':
+                                console.log('bakery item list :', res.data);
+                                this.showSnackbar('success', '刪除成功');
+                                this.getBakeryItem();
+                                break;
+                            default:
+                                break;
+                        }
+                    } else this.showSnackbar('error', '取得商品清單發生異常，請稍後再嘗試。');
+                })
+        }
     }
 
     // handle 勾選
