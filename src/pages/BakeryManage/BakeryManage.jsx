@@ -25,16 +25,15 @@ class BakeryManage extends Component {
             mode: 'list',
             title: '商品清單'
         }
-        this.getData = this.getData.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
         this.handleRowClick = this.handleRowClick.bind(this);
         this.showList = this.showList.bind(this);
-
     }
 
     componentDidMount = () => {
         this.getBakeryItem();
     }
+
 
     showList = async () => {
         await this.setState({
@@ -69,9 +68,11 @@ class BakeryManage extends Component {
                                     productName: '麵包一',
                                     unitPrice: item.FUnitPrice,
                                     storageCount: item.FStorageCount,
-                                    ingredients: ['1', '2', '3', '4', '5', '6'],
+                                    ingredients: item.ingredients,
                                     storageDays: item.FStorageDays,
                                     storageMethod: item.FStorageMethod,
+                                    FBakeryIngredientId: item.FBakeryIngredientId,
+                                    FBakeryItemId: item.FBakeryItemId,
                                     id: index
                                 })
                             })
@@ -83,9 +84,9 @@ class BakeryManage extends Component {
                         default:
                             break;
                     }
-                } else this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。');
+                } else this.showSnackbar('error', '取得商品清單發生異常，請稍後再嘗試。');
             })
-            .catch((e) => { this.showSnackbar('error', '註冊發生異常，請稍後再嘗試。'); });
+            .catch((e) => { this.showSnackbar('error', '取得商品清單發生異常，請稍後再嘗試。'); });
     }
 
     // 編輯
@@ -110,14 +111,13 @@ class BakeryManage extends Component {
     // 刪除
     doDelete = () => {
         if (this.state.selectItemData.length === 0 || this.state.selectItemId.length === 0)
-            alert('請選擇一筆')
+            this.showSnackbar('error', '請至少選擇一筆');
 
         this.getBakeryItem();
     }
 
     // handle 勾選
     handleSelect = (item) => {
-        console.log(item);
         const state = {};
         const itemData = [];
         if (item.length > 0)
@@ -130,7 +130,6 @@ class BakeryManage extends Component {
         state.selectItemData = itemData;
         state.selectItemId = item
         this.setState(state)
-
     }
 
     // handle 點擊列
@@ -138,46 +137,6 @@ class BakeryManage extends Component {
         console.log(item);
     }
 
-    // 取得資料
-    getData = () => {
-        const data = [{
-            productName: '麵包一',
-            unitPrice: 100,
-            storageCount: 0,
-            ingredients: ['1', '2', '3', '4', '5', '6'],
-            storageDays: 3,
-            storageMethod: '12小時內未食用完必須冰冷藏',
-            id: 0
-        }, {
-            id: 1123,
-            productName: '麵包2',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 2,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '奶油', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            id: 3,
-            productName: '麵包32',
-            unitPrice: 80,
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '巧克力'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }]
-
-        this.setState({
-            data
-        })
-    }
     render() {
         const columns = [
             { field: 'id', headerName: 'ID', width: 50 },
@@ -270,8 +229,6 @@ class BakeryManage extends Component {
                             <BakerySheet data={this.state.selectItemData} mode={this.state.mode} />
                         </Grid>
                 }
-
-
             </Grid >
         );
     }
