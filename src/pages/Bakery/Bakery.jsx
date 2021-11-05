@@ -29,6 +29,8 @@ import Paper from '@mui/material/Paper';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
+import { Config } from '../../core/config';
 
 const actions = [
     { icon: <ShoppingCartIcon />, name: '購物清單' },
@@ -40,7 +42,7 @@ export default class Bakery extends Component {
         super();
 
         this.state = {
-            newsData: [],
+            data: [],
             isCartDialogOpen: false,
             count: 0,
             currentProductInfo: {
@@ -56,7 +58,7 @@ export default class Bakery extends Component {
             isOrderListDialogOpen: false
         }
 
-        this.getNewsData = this.getNewsData.bind(this);
+        this.getData = this.getData.bind(this);
         this.handleCountChange = this.handleCountChange.bind(this);
         this.handleProductInfo = this.handleProductInfo.bind(this);
         this.addCart = this.addCart.bind(this);
@@ -85,7 +87,7 @@ export default class Bakery extends Component {
         }
     }
     // 購物清單數量減少
-    orderListDecrease =async (row, index) => {
+    orderListDecrease = async (row, index) => {
         const orderList = this.state.orderList;
 
         if (orderList[index].count === 1) orderList.splice(index, 1);
@@ -97,7 +99,7 @@ export default class Bakery extends Component {
         this.countOrderTotalPrice();
     }
     // 購物清單刪除
-    orderListDelete =async (row, index) => {
+    orderListDelete = async (row, index) => {
         const orderList = this.state.orderList;
         orderList.splice(index, 1);
         await this.setState({ orderList });
@@ -113,7 +115,7 @@ export default class Bakery extends Component {
     }
 
     // 計算訂單總金額
-    countOrderTotalPrice = async ()=>{
+    countOrderTotalPrice = async () => {
         const orderList = this.state.orderList;
         const state = {};
         if (orderList.length > 0) {
@@ -202,69 +204,78 @@ export default class Bakery extends Component {
     }
 
     // 取得資料
-    getNewsData = () => {
-        const data = [{
-            productName: '麵包一',
-            unitPrice: 100,
-            productImgUrl: '/bakeryImg/01.jpg',
-            storageCount: 0,
-
-            ingredients: ['麵粉', '鮮奶', '紅豆'],
-            storageDays: 3,
-            storageMethod: '12小時內未食用完必須冰冷藏'
-        }, {
-            productName: '麵包2',
-            unitPrice: 80,
-            productImgUrl: '/bakeryImg/02.jpg',
-            storageCount: 12,
-            ingredients: ['麵粉', '鮮奶', '糖粉'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            productName: '麵包3',
-            unitPrice: 60,
-            productImgUrl: '/bakeryImg/03.jpg',
-            storageCount: 7,
-            ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            productName: '麵包4',
-            unitPrice: 110,
-            productImgUrl: '/bakeryImg/04.jpg',
-            storageCount: 2,
-            ingredients: ['無鹽奶油', '鮮奶', '水'],
-            storageDays: 3,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            productName: '麵包5',
-            unitPrice: 60,
-            productImgUrl: '/bakeryImg/05.jpg',
-            storageCount: 7,
-            ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
-            storageDays: 5,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            productName: '麵包6',
-            unitPrice: 110,
-            productImgUrl: '/bakeryImg/06.jpg',
-            storageCount: 2,
-            ingredients: ['無鹽奶油', '鮮奶', '水'],
-            storageDays: 3,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }, {
-            productName: '麵包7',
-            unitPrice: 110,
-            productImgUrl: '/bakeryImg/07.jpg',
-            storageCount: 2,
-            ingredients: ['無鹽奶油', '鮮奶', '水'],
-            storageDays: 3,
-            storageMethod: '24小時內未食用完必須冰冷藏'
-        }]
-
-        this.setState({
-            newsData: data
+    getData = async () => {
+        await axios.post(Config.apiUrl + '/bakery/item/list').then((res) => {
+            console.log(res)
+            if (res.data.code === 20000) {
+                this.setState({
+                    data: res.data.data
+                })
+            }
         })
+
+        // const data = [{
+        //     productName: '麵包一',
+        //     unitPrice: 100,
+        //     productImgUrl: '/bakeryImg/01.jpg',
+        //     storageCount: 0,
+
+        //     ingredients: ['麵粉', '鮮奶', '紅豆'],
+        //     storageDays: 3,
+        //     storageMethod: '12小時內未食用完必須冰冷藏'
+        // }, {
+        //     productName: '麵包2',
+        //     unitPrice: 80,
+        //     productImgUrl: '/bakeryImg/02.jpg',
+        //     storageCount: 12,
+        //     ingredients: ['麵粉', '鮮奶', '糖粉'],
+        //     storageDays: 5,
+        //     storageMethod: '24小時內未食用完必須冰冷藏'
+        // }, {
+        //     productName: '麵包3',
+        //     unitPrice: 60,
+        //     productImgUrl: '/bakeryImg/03.jpg',
+        //     storageCount: 7,
+        //     ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
+        //     storageDays: 5,
+        //     storageMethod: '24小時內未食用完必須冰冷藏'
+        // }, {
+        //     productName: '麵包4',
+        //     unitPrice: 110,
+        //     productImgUrl: '/bakeryImg/04.jpg',
+        //     storageCount: 2,
+        //     ingredients: ['無鹽奶油', '鮮奶', '水'],
+        //     storageDays: 3,
+        //     storageMethod: '24小時內未食用完必須冰冷藏'
+        // }, {
+        //     productName: '麵包5',
+        //     unitPrice: 60,
+        //     productImgUrl: '/bakeryImg/05.jpg',
+        //     storageCount: 7,
+        //     ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
+        //     storageDays: 5,
+        //     storageMethod: '24小時內未食用完必須冰冷藏'
+        // }, {
+        //     productName: '麵包6',
+        //     unitPrice: 110,
+        //     productImgUrl: '/bakeryImg/06.jpg',
+        //     storageCount: 2,
+        //     ingredients: ['無鹽奶油', '鮮奶', '水'],
+        //     storageDays: 3,
+        //     storageMethod: '24小時內未食用完必須冰冷藏'
+        // }, {
+        //     productName: '麵包7',
+        //     unitPrice: 110,
+        //     productImgUrl: '/bakeryImg/07.jpg',
+        //     storageCount: 2,
+        //     ingredients: ['無鹽奶油', '鮮奶', '水'],
+        //     storageDays: 3,
+        //     storageMethod: '24小時內未食用完必須冰冷藏'
+        // }]
+
+        // this.setState({
+        //     newsData: data
+        // })
     }
 
     // 結帳
@@ -272,7 +283,7 @@ export default class Bakery extends Component {
         alert('結帳')
     }
     componentDidMount = () => {
-        this.getNewsData();
+        this.getData();
     }
 
     render() {
@@ -280,7 +291,7 @@ export default class Bakery extends Component {
             <div style={{ width: '100%', padding: '0.5rem' }}>
                 <Grid container spacing={2}>
                     {
-                        this.state.newsData.map((item, idx) => {
+                        this.state.data.map((item, idx) => {
                             return (<Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
                         })
                     }

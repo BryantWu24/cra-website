@@ -32,8 +32,10 @@ class BakeryCard extends Component {
             isLoading: false
         })
     }
+
+
     render() {
-        const price = '$' + this.props.data.unitPrice;
+        const price = '$' + this.props.data.FUnitPrice;
         return (
             <div>
                 <Backdrop
@@ -44,26 +46,35 @@ class BakeryCard extends Component {
                 </Backdrop>
                 <Card sx={{ maxWidth: 345 }}>
                     <CardHeader
-                        title={this.props.data.productName}
+                        title={this.props.data.FName}
                         action={
-                            <IconButton aria-label="add to cart" onClick={this.passInfo} >
+                            <IconButton aria-label="add to cart" onClick={this.passInfo} disabled={!this.props.data.FStorageCount}>
                                 <AddShoppingCartIcon />
                             </IconButton>
                         }
                     />
-                    <CardMedia
-                        component="img"
-                        height="200"
-                        image={this.props.data.productImgUrl}
-                        alt="Picture"
-                        onLoad={this.handleImgOnLoad}
-                    />
+                    {
+                        (!!this.props.data.productImgUrl) ?
+                            <CardMedia
+                                component="img"
+                                height="200"
+                                image={this.props.data.productImgUrl}
+                                alt="Picture"
+                                onLoad={this.handleImgOnLoad}
+                                onError={this.handleImgOnLoad}
+                            /> :
+                            <CardMedia
+                                component="img"
+                                height="200"
+                                image="/bakeryImg/01.jpg"
+                                alt="Picture"
+                                onLoad={this.handleImgOnLoad}
+                                onError={this.handleImgOnLoad}
+                            />
+                    }
                     <CardContent>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>
                             價格：{price}
-                        </Typography>
-                        <Typography color="text.secondary" style={{ textAlign: 'left' }}>
-                            剩餘數量：{this.props.data.storageCount}
                         </Typography>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>
                             成分：{
@@ -76,10 +87,10 @@ class BakeryCard extends Component {
                             }
                         </Typography>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>
-                            保存期限：{this.props.data.storageDays} 天
+                            保存期限：{this.props.data.FStorageDays} 天
                         </Typography>
                         <Typography color="text.secondary" style={{ textAlign: 'left' }}>
-                            保存方法：{this.props.data.storageMethod}
+                            保存方法：{this.props.data.FStorageMethod}
                         </Typography>
                     </CardContent>
                 </Card>
