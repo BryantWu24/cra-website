@@ -117,6 +117,15 @@ const querySelectList = (tableName, resFunction) => {
     return res;
 };
 
+app.post('/db/table', function async (req, res) {
+    db.query(`select TABLE_NAME from information_schema.tables where TABLE_SCHEMA='cra-website'`, function async (err, tableName, fields) {
+        let response;
+        if (err) response = apiResponse(20099, [], TEXT.SearchFail);
+        else response = apiResponse(20000, tableName, TEXT.SearchSuccess);
+        res.send(response);
+    })
+})
+
 // 取得使用者
 app.post("/user/list", function async (req, res) {
     querySelectList('user', res);
@@ -125,6 +134,11 @@ app.post("/user/list", function async (req, res) {
 // 取得麵包坊原料
 app.post("/bakery/material/list", function async (req, res) {
     querySelectList('bakery_material', res);
+})
+
+// 取得麵包坊組成成分
+app.post("/bakery/ingredients/list", function async (req, res) {
+    querySelectList('bakery_ingredients', res);
 })
 
 // 取得麵包坊列表

@@ -8,13 +8,12 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
-import {Config} from '../../core/config'
+import { Config } from '../../core/config'
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const tabHeader = ["User", "Auth", "Role", "List","Bakery_Material"];
 
 class Database extends Component {
     constructor() {
@@ -28,7 +27,8 @@ class Database extends Component {
             alertSeverity: '',
             isSnackbarOpen: false,
             isLoading: false,
-            isQureyFailed: false
+            isQureyFailed: false,
+            tableNameData: []
         }
 
         this.handleTabChange = this.handleTabChange.bind(this);
@@ -36,7 +36,10 @@ class Database extends Component {
     componentDidMount = () => {
         this.setState({
             isLoading: true
-        }, () => { this.getTableData('user'); })
+        }, async () => {
+            await this.getTableNameData();
+            await this.getTableData(this.state.tableNameData[0].replace('_', '/'));
+        })
     }
 
     // 切換 Tab
@@ -45,27 +48,9 @@ class Database extends Component {
             currentTab: value,
             isLoading: true
         })
-
-        switch (value.toString()) {
-            case '0':
-                this.getTableData('user');
-                break;
-            case '1':
-                this.getTableData('auth');
-                break;
-            case '2':
-                this.getTableData('role');
-                break;
-            case '3':
-                this.getTableData('list');
-                break;
-            case '4':
-                this.getTableData('bakery/material');
-                break;
-            default:
-                break;
-
-        }
+        const tableNameData = this.state.tableNameData;
+        const tableName = tableNameData[value].replace('_', '/')
+        this.getTableData(tableName);
     }
 
     // 顯示通知框
@@ -101,7 +86,6 @@ class Database extends Component {
         await axios
             .post(url)
             .then((res) => {
-                console.log(res);
                 if (res.data.code === 20000) this.setTableFormat(res);
                 else {
                     this.setState({
@@ -118,6 +102,21 @@ class Database extends Component {
                 });
                 this.setLoading(false);
                 this.showSnackbar('error', '查詢失敗');
+            })
+    }
+
+    // 取得資料表名稱
+    getTableNameData = async () => {
+        await axios
+            .post(Config.apiUrl + "/db/table")
+            .then((res) => {
+                console.log(res);
+                if (res.data?.code === 20000) {
+                    const tableNameData = res.data.data.map((item) => item.TABLE_NAME)
+                    this.setState({ tableNameData })
+                } else {
+                    this.showSnackbar('error', '取得資料表名稱失敗');
+                }
             })
     }
 
@@ -194,39 +193,47 @@ class Database extends Component {
                         {this.state.snackbarMsg}
                     </Alert>
                 </Snackbar>
-                <Grid container justifyContent='center' >
-                    <Grid item sm={12} lg={12} style={{ bgcolor: 'white', maxWidth: '90VW' }}>
-                        <Box style={{ bgcolor: 'white', marginTop: '1rem' }}>
-                            <Tabs
-                                value={this.state.currentTab}
-                                onChange={this.handleTabChange}
-                                variant="scrollable"
-                                scrollButtons={true}
-                                aria-label="scrollable auto tabs example"
-                            >
-                                {
-                                    tabHeader.map((label) => <Tab label={label} />)
-                                }
-                            </Tabs>
-                        </Box>
-                    </Grid>
-                    <Grid item sm={12} lg={12} style={{ bgcolor: 'white', maxWidth: '90VW' }}>
-                        <Backdrop
-                            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                            open={this.state.isLoading}
-                        >
-                            <CircularProgress color="inherit" />
-                        </Backdrop>
-                        <Box style={{ bgcolor: 'white', marginTop: '1rem' }}>
-                            {(!!this.state.isLoading)
-                                ?
-                                <div>查詢中...</div>
-                                :
-                                this.setTable()
-                            }
-                        </Box>
-                    </Grid>
-                </Grid>
+                {
+                    (this.state.tableNameData.length === 0)
+                        ?
+                        <div> 資料表查詢異常 </div>
+                        :
+                        <Grid container justifyContent='center' >
+                            <Grid item sm={12} lg={12} style={{ bgcolor: 'white', maxWidth: '90VW' }}>
+                                <Box style={{ bgcolor: 'white', marginTop: '1rem' }}>
+                                    <Tabs
+                                        value={this.state.currentTab}
+                                        onChange={this.handleTabChange}
+                                        variant="scrollable"
+                                        scrollButtons={true}
+                                        aria-label="scrollable auto tabs example"
+                                    >
+                                        {
+                                            this.state.tableNameData.map((label) => <Tab key={label} label={label} />)
+                                        }
+                                    </Tabs>
+                                </Box>
+                            </Grid>
+                            <Grid item sm={12} lg={12} style={{ bgcolor: 'white', maxWidth: '90VW' }}>
+                                <Backdrop
+                                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                                    open={this.state.isLoading}
+                                >
+                                    <CircularProgress color="inherit" />
+                                </Backdrop>
+                                <Box style={{ bgcolor: 'white', marginTop: '1rem' }}>
+                                    {(!!this.state.isLoading)
+                                        ?
+                                        <div>查詢中...</div>
+                                        :
+                                        this.setTable()
+                                    }
+                                </Box>
+                            </Grid>
+                        </Grid>
+
+
+                }
 
 
             </div>
