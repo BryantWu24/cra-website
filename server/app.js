@@ -4,7 +4,7 @@
 //     data : array object
 //     message : string
 // }
-// code: 20000 - 成功
+// code: 20000 - 執行成功 
 // code: 20099 - 執行失敗，會帶入 message
 
 const express = require("express");
@@ -13,7 +13,7 @@ const app = express();
 const port = 7000;
 const cors = require('cors');
 const corsOptions = {
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000',
     credentials: true,
     optionSuccessStatus: 200
 }
@@ -33,8 +33,7 @@ const apiResponse = (code, data, message) => {
             res.data = data;
             res.message = message;
             break;
-        case '20001':
-        case '20002':
+        case '20099':
             res.message = message;
             break;
         default:
@@ -43,32 +42,62 @@ const apiResponse = (code, data, message) => {
     return res;
 }
 
+const TEXT = {
+    "CreateSuccess": "建立成功",
+    "CreateFail": "建立失敗",
+    "RegisterSuccess": "註冊成功",
+    "RegisterFail": "註冊失敗",
+    "AccountPasswordError": "帳號密碼輸入錯誤",
+    "LoginSuccess": "登入成功",
+    "LoginException": "登入異常，請稍後再嘗試",
+    "LoginFail": "登入失敗",
+    "SearchSuccess": "查詢成功",
+    "SearchFail": "查詢失敗",
+    "SearchAuthFail": "查詢權限失敗",
+    "DeleteSuccess": "刪除成功",
+    "DeleteFail": "刪除失敗",
+    "SaveSuccess": "儲存成功",
+    "SaveFail": "儲存失敗",
+    "MaterialIsExist": "此原料已被建立"
+}
+
 // 登入
 app.post("/login", function async (req, res) {
-    var account = req.body.account;
-    var password = req.body.password;
+    const account = req.body.account;
+    const password = req.body.password;
     db.query(
         `SELECT * FROM user WHERE FAccount='${account}' AND FPassword='${password}'`,
         function (err, userRows, fields) {
-            if (userRows.length === 0) {
-                const noDataResponse = apiResponse(20001, [], '帳號密碼輸入錯誤');
-                return res.send(noDataResponse);
+            if (err) {
+                console.log('/login API Error Log :', err);
+                const response = apiResponse(20099, [], TEXT.LoginException);
+                return res.send(response);
             } else {
-                db.query(
-                    `SELECT * FROM auth WHERE FRoleId='${userRows[0].FRoleId}'`,
-                    function (err, authRows, fields) {
-                        const listAry = [];
-                        authRows.forEach(item => {
-                            listAry.push({
-                                key: item.FListKey.toUpperCase(),
-                                title: item.FListName
-                            });
-                        });
-                        userRows[0].list = listAry;
-                        const response = apiResponse(20000, userRows, '登入成功');
-                        return res.send(response);
-                    }
-                )
+                if (userRows.length === 0) {
+                    const noDataResponse = apiResponse(20099, [], TEXT.AccountPasswordError);
+                    return res.send(noDataResponse);
+                } else {
+                    db.query(
+                        `SELECT * FROM auth WHERE FRoleId='${userRows[0].FRoleId}'`,
+                        function (err, authRows, fields) {
+                            if (err) {
+                                const response = apiResponse(20099, [], TEXT.SearchAuthFail);
+                                return res.send(response);
+                            } else {
+                                const listAry = [];
+                                authRows.forEach(item => {
+                                    listAry.push({
+                                        key: item.FListKey.toUpperCase(),
+                                        title: item.FListName
+                                    });
+                                });
+                                userRows[0].list = listAry;
+                                const response = apiResponse(20000, userRows, TEXT.LoginSuccess);
+                                return res.send(response);
+                            }
+                        }
+                    )
+                }
             }
         }
     );
@@ -77,8 +106,13 @@ app.post("/login", function async (req, res) {
 // 查整張表
 const querySelectList = (tableName, resFunction) => {
     const res = db.query(`SELECT * FROM ${tableName}`, function (err, rows, fields) {
-        const response = apiResponse(20000, rows,'查詢成功');
-        return resFunction.send(response);
+        if (err) {
+            console.log('Search ' + tableName + ' Table Error Log :', err);
+            throw err;
+        } else {
+            const response = apiResponse(20000, rows, TEXT.SearchSucces);
+            return resFunction.send(response);
+        }
     });
     return res;
 };
@@ -108,18 +142,21 @@ app.post("/bakery/item/list", function async (req, res) {
             })
 
             Promise.all(promiseAry).then(() => {
-                const finalResponse = apiResponse(20000, final, '取得麵包坊列表成功');
+                const finalResponse = apiResponse(20000, final, TEXT.SearchSucces);
                 res.send(finalResponse);
             })
         })
     })()
 })
 
+// 取得指定商品組合成分
 function getIngredientsById(item) {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_ingredients WHERE FBakeryIngredientId = '${item.FBakeryIngredientId}'`, function async (err, ingredientRows, fields) {
-            if (err) reject(err);
-            else {
+            if (err) {
+                console.log('Do getIngredientsById Error Log : ', err);
+                reject(err);
+            } else {
                 const ingredients = [];
                 ingredientRows.forEach((item) => {
                     ingredients.push(item.FBakeryMaterialName);
@@ -130,11 +167,14 @@ function getIngredientsById(item) {
     });
 }
 
+// 取得麵包坊商品清單
 function getBakeryItemList() {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_item`, function async (err, itemRows, fields) {
-            if (err) reject(err);
-            else resolve(itemRows);
+            if (err) {
+                console.log('Do getBakeryItemList Error Log : ', err);
+                reject(err);
+            } else resolve(itemRows);
         })
     });
 }
@@ -158,25 +198,28 @@ app.post("/list/list", function async (req, res) {
 app.post("/user/create", function async (req, res) {
     const body = req.body;
     body.FUserId = _uuid();
-    db.query('INSERT INTO user SET ?', body, function (error, results, fields) {
-        if (error) throw error;
-        else {
+    db.query('INSERT INTO user SET ?', body, function (err, results, fields) {
+        let finalResponse;
+        if (err) {
+            console.log('/user/create Error Log : ', err);
+            finalResponse = apiResponse(20099, [], TEXT.RegisterFail);
+        } else {
             delete body.FAccount;
             delete body.FPassword;
-            return res.send({
-                code: 20000,
-                data: [body]
-            })
+            finalResponse = apiResponse(20000, [body], TEXT.RegisterSuccess);
         }
+        return res.send(finalResponse)
     });
 });
 
 // 刪除產品 SQL
 function deleteBakeryItem(FBakeryItemId) {
     return new Promise((resolve, reject) => {
-        db.query(`DELETE FROM  bakery_item WHERE FBakeryItemId='${FBakeryItemId}'`, function (error, fields) {
-            if (error) reject(error);
-            else resolve();
+        db.query(`DELETE FROM  bakery_item WHERE FBakeryItemId='${FBakeryItemId}'`, function (err, fields) {
+            if (err) {
+                console.log('Do deleteBakeryItem Error Log : ', err);
+                reject(err);
+            } else resolve();
         });
     });
 }
@@ -200,7 +243,7 @@ app.post("/bakery/item/delete", function async (req, res) {
 
             Promise.all(deleteBakeryItemAry).then(() => {
                 Promise.all(deleteBakeryIngredientAry).then(() => {
-                    const finalResponse = apiResponse(20000, [],'刪除成功');
+                    const finalResponse = apiResponse(20000, [], TEXT.DeleteSuccess);
                     res.send(finalResponse)
                 })
             })
@@ -219,16 +262,20 @@ app.post("/bakery/item/update", function async (req, res) {
     // 更新商品
     const updateItem = new Promise((resolve, reject) => {
         db.query('update bakery_item set ? where FBakeryItemId = ?', [body, body.FBakeryItemId], function (err, fields) {
-            if (err) reject(err);
-            else resolve();
+            if (err) {
+                console.log('/bakery/item/update Error Log : ', err);
+                reject(err);
+            } else resolve();
         });
     });
 
     // 取得所有原料
     const getAllMaterial = new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_material`, function (err, rows, fields) {
-            if (err) reject(err)
-            else {
+            if (err) {
+                console.log('Do getAllMaterial Error Log : ', err);
+                reject(err)
+            } else {
                 allMaterial = rows;
                 resolve(allMaterial);
             }
@@ -238,8 +285,10 @@ app.post("/bakery/item/update", function async (req, res) {
     // 取得現有組成成分
     const getCurMaterial = new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_ingredients WHERE FBakeryIngredientId = '${body.FBakeryIngredientId}'`, function (err, rows, fields) {
-            if (err) reject(err)
-            else {
+            if (err) {
+                console.log('Do getCurMaterial Error Log : ', err);
+                reject(err)
+            } else {
                 curMaterial = rows;
                 resolve(curMaterial)
             }
@@ -290,7 +339,7 @@ app.post("/bakery/item/update", function async (req, res) {
     }).then((action) => {
         if (action.insert.length > 0) {
             // 通過async/await去操作得到的Promise對象
-            return (async function () {
+            (async function () {
                 const insertPromiseAry = action.insert.map(async (item, index) => {
                     const ingredientsBody = {
                         FBakeryIngredientId: body.FBakeryIngredientId,
@@ -304,34 +353,36 @@ app.post("/bakery/item/update", function async (req, res) {
                     if (action.delete.length > 0) {
                         // 通過async/await去操作得到的Promise對象
                         (async function () {
-                            const deletePromiseAry = action.insert.map(async (item) => {
+                            const deletePromiseAry = action.delete.map(async (item) => {
                                 const deletePromise = await deleteIngredients(body.FBakeryIngredientId, item.FBakeryMaterialId);
                                 return deletePromise;
                             })
 
                             Promise.all(deletePromiseAry).then(() => {
-                                const finalResponse = apiResponse(20000, [], '儲存成功');
+                                const finalResponse = apiResponse(20000, [], TEXT.SaveSuccess);
                                 res.send(finalResponse)
+                                Promise.resolve(action);
                             })
                         })()
-                    }
-                })
-
-            })()
-        } else return (action);
-    }).then((action) => {
-        if (action.delete.length > 0) {
-            (async function () {
-                const deletePromiseAry = action.delete.map(async (item) => {
-                    const deletePromise = await deleteIngredients(body.FBakeryIngredientId, item.FBakeryMaterialId);
-                    return deletePromise;
-                })
-
-                Promise.all(deletePromiseAry).then(() => {
-                    const finalResponse = apiResponse(20000, [], '儲存成功');
-                    res.send(finalResponse)
+                    } else Promise.resolve(action);
                 })
             })()
+        } else {
+            if (!!action && action.delete.length > 0) {
+                (async function () {
+                    const deletePromiseAry = action.delete.map(async (item) => {
+                        const deletePromise = await deleteIngredients(body.FBakeryIngredientId, item.FBakeryMaterialId);
+                        return deletePromise;
+                    })
+
+                    Promise.all(deletePromiseAry).then(() => {
+                        const finalResponse = apiResponse(20000, [], TEXT.SaveSuccess);
+                        res.send(finalResponse)
+                    })
+                })()
+            } else {
+                Promise.resolve('empty action');
+            }
         }
     })
 });
@@ -341,16 +392,26 @@ function deleteIngredients(FBakeryIngredientId, FBakeryMaterialId) {
     if (!!FBakeryIngredientId) {
         if (!!FBakeryMaterialId) {
             return new Promise((resolve, reject) => {
-                db.query(`DELETE FROM  bakery_ingredients WHERE FBakeryMaterialId='${FBakeryMaterialId}' AND  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (error, fields) {
-                    if (error) reject(error);
-                    else resolve();
+                db.query(`DELETE FROM  bakery_ingredients WHERE FBakeryMaterialId='${FBakeryMaterialId}' AND  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (err, result, fields) {
+                    if (err) {
+                        console.log('Do deleteIngredients Error log :', err)
+                        reject(err);
+                    } else {
+                        console.log('Do deleteIngredients Result log :', result)
+                        resolve();
+                    }
                 });
             });
         } else {
             return new Promise((resolve, reject) => {
-                db.query(`DELETE FROM  bakery_ingredients WHERE  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (error, fields) {
-                    if (error) reject(error);
-                    else resolve();
+                db.query(`DELETE FROM  bakery_ingredients WHERE  FBakeryIngredientId ='${FBakeryIngredientId}'`, function (err, result, fields) {
+                    if (err) {
+                        console.log('Do deleteIngredients Error log :', err)
+                        reject(err);
+                    } else {
+                        console.log('Do deleteIngredients Result log :', result);
+                        resolve();
+                    }
                 });
             });
         }
@@ -380,16 +441,14 @@ app.post("/bakery/material/create", function async (req, res) {
             db.query('INSERT INTO bakery_material SET ?', body, function (error, results, fields) {
                 if (error) throw error;
                 else {
-                    return res.send({
-                        code: 20000,
-                        data: [body]
-                    })
+                    const finalResponse = apiResponse(20000, [body], TEXT.CreateSuccess);
+                    return res.send(finalResponse)
                 }
             });
         } else {
             return res.send({
-                code: 20001,
-                message: '此成分已被建立'
+                code: 20099,
+                message: TEXT.MaterialIsExist
             })
         }
     })
@@ -431,10 +490,8 @@ app.post("/bakery/item/create", function async (req, res) {
     db.query('INSERT INTO bakery_item SET ?', itemBody, function (error, results, fields) {
         if (error) throw error;
         else {
-            return res.send({
-                code: 20000,
-                data: [body]
-            })
+            const finalResponse = apiResponse(20000, [body], TEXT.CreateSuccess);
+            return res.send(finalResponse)
         }
     });
 

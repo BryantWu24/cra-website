@@ -379,7 +379,7 @@ class Backend extends Component {
                                 const snackbarMsg = '歡迎 ' + data.FUserName + ' 蒞臨本網站';
                                 this.showSnackbar('success', snackbarMsg);
                                 break;
-                            case '20001':
+                            case '20099':
                                 this.showSnackbar('error', res.data.message);
                                 break;
                             default:

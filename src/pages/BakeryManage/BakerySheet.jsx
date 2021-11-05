@@ -115,7 +115,7 @@ class BakerySheet extends Component {
                                 this.getMaterial();
                                 this.switchAddMaterialDialog(false);
                                 break;
-                            case '20001':
+                            case '20099':
                                 this.showSnackbar('error', res.data.message);
                                 break;
                             default:
@@ -159,7 +159,7 @@ class BakerySheet extends Component {
 
         this.doVerify();
         const errorData = this.state.errorData;
-        if (Object.values(errorData).some(item => item.length !== 0)) this.showSnackbar('error', '儲存失敗')
+        if (Object.values(errorData).some(item => item.length !== 0)) this.showSnackbar('error', '請確認資料是否填寫正確')
         else {
             const itemData = this.state.data;
             const request = {};
@@ -180,7 +180,7 @@ class BakerySheet extends Component {
                             console.log('bakery item update :', res.data);
                             switch (res.data.code.toString()) {
                                 case '20000':
-                                    this.showSnackbar('success', '更新產品成功');
+                                    this.showSnackbar('success',res.data.message);
                                     break;
                                 case '20099':
                                     this.showSnackbar('error', res.data.message);
@@ -199,9 +199,9 @@ class BakerySheet extends Component {
                             console.log('bakery item create :', res.data);
                             switch (res.data.code.toString()) {
                                 case '20000':
-                                    this.showSnackbar('success', '新增產品成功');
+                                    this.showSnackbar('success', res.data.message);
                                     break;
-                                case '20001':
+                                case '20099':
                                     this.showSnackbar('error', res.data.message);
                                     break;
                                 default:
