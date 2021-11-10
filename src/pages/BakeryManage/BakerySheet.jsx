@@ -180,7 +180,7 @@ class BakerySheet extends Component {
                             console.log('bakery item update :', res.data);
                             switch (res.data.code.toString()) {
                                 case '20000':
-                                    this.showSnackbar('success',res.data.message);
+                                    this.showSnackbar('success', res.data.message);
                                     break;
                                 case '20099':
                                     this.showSnackbar('error', res.data.message);
@@ -199,6 +199,19 @@ class BakerySheet extends Component {
                             console.log('bakery item create :', res.data);
                             switch (res.data.code.toString()) {
                                 case '20000':
+                                    const data = {
+                                        FBakeryIngredientId: res.data.data[0].FBakeryIngredientId,
+                                        FBakeryItemId: res.data.data[0].FBakeryItemId,
+                                        ingredients: res.data.data[0].FIngredients,
+                                        productName: res.data.data[0].FName,
+                                        storageCount: res.data.data[0].FStorageCount,
+                                        storageDays: res.data.data[0].FStorageDays,
+                                        storageMethod: res.data.data[0].FStorageMethod,
+                                        unitPrice: res.data.data[0].FUnitPrice
+                                    }
+                                    this.setState({
+                                        data
+                                    })
                                     this.showSnackbar('success', res.data.message);
                                     break;
                                 case '20099':
