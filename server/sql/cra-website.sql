@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-11-02 11:23:06
+-- 產生時間： 2021-11-09 11:20:14
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -67,12 +67,33 @@ CREATE TABLE `bakery_ingredients` (
 --
 
 INSERT INTO `bakery_ingredients` (`FBakeryIngredientId`, `FBakeryMaterialId`, `FBakeryMaterialName`) VALUES
-('21f3d54c-9b33-41d5-9a62-fe143f5ee8f3', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
-('21f3d54c-9b33-41d5-9a62-fe143f5ee8f3', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
-('21f3d54c-9b33-41d5-9a62-fe143f5ee8f3', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
-('5d445843-2654-428e-bcd3-0d28befa7a39', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
-('5d445843-2654-428e-bcd3-0d28befa7a39', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
-('5d445843-2654-428e-bcd3-0d28befa7a39', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油');
+('d2c1f75b-1043-496c-ac7b-b130e222e1da', '7299b5ba-439a-494a-9c07-99d46e9d47e3', '細砂糖'),
+('d2c1f75b-1043-496c-ac7b-b130e222e1da', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
+('d2c1f75b-1043-496c-ac7b-b130e222e1da', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('d2c1f75b-1043-496c-ac7b-b130e222e1da', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('bdef2f5a-3209-4dce-a929-d6556833f2f6', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('bdef2f5a-3209-4dce-a929-d6556833f2f6', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('bdef2f5a-3209-4dce-a929-d6556833f2f6', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
+('8a07656e-2f66-4172-80c0-f7e604365a8e', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('6c51ae31-ed2c-49c8-8e1d-acf6d496a7a2', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('6c51ae31-ed2c-49c8-8e1d-acf6d496a7a2', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
+('7b961300-7d0a-4916-83eb-20b6b581ede1', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('7b961300-7d0a-4916-83eb-20b6b581ede1', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('94f634fc-e870-479d-bacd-07002d0b3c87', '7299b5ba-439a-494a-9c07-99d46e9d47e3', '細砂糖'),
+('94f634fc-e870-479d-bacd-07002d0b3c87', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('94f634fc-e870-479d-bacd-07002d0b3c87', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('94f634fc-e870-479d-bacd-07002d0b3c87', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('fede6587-8185-4360-8d81-28d9ce75c4b3', '7299b5ba-439a-494a-9c07-99d46e9d47e3', '細砂糖'),
+('fede6587-8185-4360-8d81-28d9ce75c4b3', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('fede6587-8185-4360-8d81-28d9ce75c4b3', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
+('f6518055-5d9b-4300-b351-5fcc4ee1b2c1', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('f6518055-5d9b-4300-b351-5fcc4ee1b2c1', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
+('267b17c1-4e21-4812-8d02-15f5b50fa0e4', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('267b17c1-4e21-4812-8d02-15f5b50fa0e4', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
+('e1c472fa-8449-4c4c-bac2-0b6c4f9f5d6a', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('e1c472fa-8449-4c4c-bac2-0b6c4f9f5d6a', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('e709f7ab-ffe6-400b-8ea3-38a07ff6ad6a', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('e709f7ab-ffe6-400b-8ea3-38a07ff6ad6a', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油');
 
 -- --------------------------------------------------------
 
@@ -95,7 +116,17 @@ CREATE TABLE `bakery_item` (
 --
 
 INSERT INTO `bakery_item` (`FBakeryItemId`, `FName`, `FUnitPrice`, `FStorageCount`, `FStorageDays`, `FStorageMethod`, `FBakeryIngredientId`) VALUES
-('adc94e75-d7c1-40c1-af6e-bf2cd9605a0c', '123', 123, 1, 1, '123', '5d445843-2654-428e-bcd3-0d28befa7a39');
+('c89f69f2-2e21-40ab-bdc8-182ae54d0c59', '麵包一', 1, 1, 12, 'q', 'd2c1f75b-1043-496c-ac7b-b130e222e1da'),
+('13af2503-37f1-4c79-845d-3a7f95b30b73', '吐司', 90, 10, 30, '吐司保存方法', 'bdef2f5a-3209-4dce-a929-d6556833f2f6'),
+('5f4c4b4a-2e9c-4473-b442-7a12c5575be5', '123', 12, 0, 0, '放冰箱', '8a07656e-2f66-4172-80c0-f7e604365a8e'),
+('361fa9ca-bdcb-4bcb-91cf-f48952d0b8ec', 'asd', 1, 1, 1, '12小時內未食用完必須冰冷藏', '6c51ae31-ed2c-49c8-8e1d-acf6d496a7a2'),
+('02c392bb-4f4b-48e8-a223-ed24e8fcfeba', '22', 22, 22, 22, '12小時內未食用完必須冰冷藏', '7b961300-7d0a-4916-83eb-20b6b581ede1'),
+('81780e1a-63e6-4ee6-903c-0dfed5b14d3d', '1', 1, 1, 1, '1', '94f634fc-e870-479d-bacd-07002d0b3c87'),
+('2554d0e5-a3b2-4faa-9d7d-7b778793cc17', '12222', 0, 222, 2222, '2222', 'fede6587-8185-4360-8d81-28d9ce75c4b3'),
+('8b2b537a-eb04-4a7d-b319-d2c721019daa', 'asd', 0, 444, 44, '44', 'f6518055-5d9b-4300-b351-5fcc4ee1b2c1'),
+('2a57210f-c591-4681-9e42-72bac1aeb6e9', 'zzzz', 0, 11, 11, '11', '267b17c1-4e21-4812-8d02-15f5b50fa0e4'),
+('bbe3685a-5c61-4d43-a0cd-e90315f8a149', 'gggg', 0, 11, 11, '11', 'e1c472fa-8449-4c4c-bac2-0b6c4f9f5d6a'),
+('bcac1290-8f40-4409-b55f-53d42713e5f8', 'll', 0, 2, 2, '2', 'e709f7ab-ffe6-400b-8ea3-38a07ff6ad6a');
 
 -- --------------------------------------------------------
 
@@ -118,6 +149,49 @@ INSERT INTO `bakery_material` (`FBakeryMaterialId`, `FName`) VALUES
 ('a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
 ('e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
 ('4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bakery_order`
+--
+
+CREATE TABLE `bakery_order` (
+  `FOrderId` varchar(36) NOT NULL,
+  `FUserId` varchar(36) NOT NULL,
+  `FTotalPrice` int(100) NOT NULL,
+  `FCreateDate` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bakery_order_detail`
+--
+
+CREATE TABLE `bakery_order_detail` (
+  `FOrderDetailId` varchar(36) NOT NULL,
+  `FOrderId` varchar(36) NOT NULL,
+  `FBakeryItemId` varchar(36) NOT NULL,
+  `FName` varchar(20) NOT NULL,
+  `FCount` int(10) NOT NULL,
+  `FUnitPrice` int(10) NOT NULL,
+  `FTotalPrice` int(10) NOT NULL,
+  `FCreateTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bakery_store`
+--
+
+CREATE TABLE `bakery_store` (
+  `FBakeryStoreId` varchar(36) NOT NULL,
+  `FBakeryItemId` varchar(36) NOT NULL,
+  `FCount` int(10) NOT NULL,
+  `FUpdateTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

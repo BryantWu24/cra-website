@@ -22,6 +22,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`RUN http://localhost:${port}`);
+
 });
 
 const apiResponse = (code, data, message) => {
@@ -58,7 +59,8 @@ const TEXT = {
     "DeleteFail": "刪除失敗",
     "SaveSuccess": "儲存成功",
     "SaveFail": "儲存失敗",
-    "MaterialIsExist": "此原料已被建立"
+    "MaterialIsExist": "此原料已被建立",
+    "CheckOutSuccess": "送出訂單成功"
 }
 
 // 登入
@@ -510,6 +512,55 @@ app.post("/bakery/item/create", function async (req, res) {
     });
 
 });
+
+// 建立麵包坊銷售紀錄
+app.post("/bakery/order/create", function async (req, res) {
+    const body = req.body;
+    const FOrderId = _uuid();
+    const promise = new Promise((resolve, reject) => {
+        const apiBody = {
+            FUserId: body.FUserId,
+            FTotalPrice: body.orderTotalPrice,
+            FOrderId
+        }
+        // 新增麵包坊銷售紀錄
+        db.query('INSERT INTO bakery_order SET ?', apiBody, function (err, result) {
+            if (err) {
+                console.log('新增麵包坊銷售紀錄失敗');
+                reject(err);
+            } else {
+                console.log('新增麵包坊銷售紀錄成功，FOrderId :', FOrderId);
+                resolve(FOrderId)
+            }
+        });
+    });
+
+    promise.then((FOrderId) => {
+        // 新增麵包坊銷售明細
+        const sql = `INSERT INTO bakery_order_detail (	FOrderDetailId,	FOrderId,	FBakeryItemId	,FName,	FCount,	FUnitPrice,	FTotalPrice ) VALUES ?`;
+        const apiBody = [];
+        body.orderList.forEach((item) => {
+            const rowBody = [_uuid(), FOrderId, item.FBakeryItemId, item.FName, item.FCount, item.FUnitPrice, item.FTotalPrice];
+            apiBody.push(rowBody);
+        })
+
+        db.query(sql, [apiBody], function (error, result) {
+            let response;
+            if (!error) {
+                console.log('新增麵包坊銷售明細成功');
+                response = apiResponse(20000, [], TEXT.CheckOutSuccess);
+            } else {
+                console.log('新增麵包坊銷售明細失敗');
+                response = apiResponse(20099, [], TEXT.CheckOutFail);
+            }
+            res.send(response);
+        });
+    }).then(()=>{
+        // 需要去更新 bakery_store 表
+    })
+
+});
+
 
 // 產生 UUID
 function _uuid() {

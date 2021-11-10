@@ -375,6 +375,7 @@ class Backend extends Component {
                                 profile.isLogin = true;
                                 result.profile = profile;
                                 result.isLogInDialogOpen = false;
+                                localStorage.setItem('profile',JSON.stringify(profile));
                                 this.setState(result)
                                 const snackbarMsg = '歡迎 ' + data.FUserName + ' 蒞臨本網站';
                                 this.showSnackbar('success', snackbarMsg);

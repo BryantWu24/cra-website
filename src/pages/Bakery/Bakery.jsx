@@ -31,10 +31,16 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { Config } from '../../core/config';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const actions = [
     { icon: <ShoppingCartIcon />, name: '購物清單' },
 ];
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export default class Bakery extends Component {
 
@@ -42,16 +48,18 @@ export default class Bakery extends Component {
         super();
 
         this.state = {
+            isSnackbarOpen: false,
+            alertSeverity: 'success',
             data: [],
             isCartDialogOpen: false,
             count: 0,
             currentProductInfo: {
                 ingredients: [],
                 price: 0,
-                storageCount: 0,
-                storageDays: 0,
-                storageMethod: "",
-                title: ""
+                FStorageCount: 0,
+                FtorageDays: 0,
+                FtorageMethod: "",
+                FName: "",
             },
             orderList: [],
             orderTotalPrice: 0,
@@ -77,9 +85,9 @@ export default class Bakery extends Component {
     orderListAdd = async (row, index) => {
         const orderList = this.state.orderList;
 
-        if (orderList[index].storageCount > orderList[index].count) {
-            orderList[index].count++;
-            orderList[index].totalPrice = orderList[index].count * orderList[index].unitPrice;
+        if (orderList[index].FStorageCount > orderList[index].FCount) {
+            orderList[index].FCount++;
+            orderList[index].FTotalPrice = orderList[index].FCount * orderList[index].FUnitPrice;
             await this.setState({ orderList });
             this.countOrderTotalPrice();
         } else {
@@ -90,10 +98,10 @@ export default class Bakery extends Component {
     orderListDecrease = async (row, index) => {
         const orderList = this.state.orderList;
 
-        if (orderList[index].count === 1) orderList.splice(index, 1);
+        if (orderList[index].FCount === 1) orderList.splice(index, 1);
         else {
-            orderList[index].count--;
-            orderList[index].totalPrice = orderList[index].count * orderList[index].unitPrice;
+            orderList[index].FCount--;
+            orderList[index].FTotalPrice = orderList[index].FCount * orderList[index].FUnitPrice;
         }
         await this.setState({ orderList });
         this.countOrderTotalPrice();
@@ -121,7 +129,7 @@ export default class Bakery extends Component {
         if (orderList.length > 0) {
             let orderTotalPrice = 0;
             orderList.forEach((item) => {
-                orderTotalPrice += item.totalPrice
+                orderTotalPrice += item.FTotalPrice
             })
             state.orderTotalPrice = orderTotalPrice;
         }
@@ -134,13 +142,14 @@ export default class Bakery extends Component {
             const curOrderList = this.state.orderList;
             const orderInfo = {}
             const profile = JSON.parse(localStorage.getItem('profile'));
+            orderInfo.FUserId = profile.id;
             orderInfo.orderer = profile.name;
-            orderInfo.productName = this.state.currentProductInfo.productName;
-            orderInfo.count = this.state.count;
-            orderInfo.storageCount = this.state.currentProductInfo.storageCount
-            orderInfo.unitPrice = this.state.currentProductInfo.unitPrice
-            orderInfo.totalPrice = this.state.currentProductInfo.unitPrice * this.state.count;
-            orderInfo.orderStatus = '備貨中'
+            orderInfo.FName = this.state.currentProductInfo.FName;
+            orderInfo.FBakeryItemId = this.state.currentProductInfo.FBakeryItemId;
+            orderInfo.FCount = this.state.count;
+            orderInfo.FStorageCount = this.state.currentProductInfo.FStorageCount
+            orderInfo.FUnitPrice = this.state.currentProductInfo.FUnitPrice
+            orderInfo.FTotalPrice = this.state.currentProductInfo.FUnitPrice * this.state.count;
             curOrderList.push(orderInfo);
             this.setState({
                 isCartDialogOpen: false,
@@ -178,9 +187,9 @@ export default class Bakery extends Component {
 
     // 設定數量下拉選單
     setSelectCountOption = () => {
-        const storageCount = this.state.currentProductInfo.storageCount;
+        const storageCount = this.state.currentProductInfo.FStorageCount;
         const ele = [];
-        for (let i = 0; i < storageCount; i++) {
+        for (let i = 0; i <= storageCount; i++) {
             ele.push(<MenuItem key={i} value={i}>{i}</MenuItem>)
         }
 
@@ -207,88 +216,98 @@ export default class Bakery extends Component {
     getData = async () => {
         await axios.post(Config.apiUrl + '/bakery/item/list').then((res) => {
             console.log(res)
+            const data = JSON.parse(JSON.stringify(res.data.data))
             if (res.data.code === 20000) {
-                this.setState({
-                    data: res.data.data
-                })
+                this.setState({ data })
             }
         })
-
-        // const data = [{
-        //     productName: '麵包一',
-        //     unitPrice: 100,
-        //     productImgUrl: '/bakeryImg/01.jpg',
-        //     storageCount: 0,
-
-        //     ingredients: ['麵粉', '鮮奶', '紅豆'],
-        //     storageDays: 3,
-        //     storageMethod: '12小時內未食用完必須冰冷藏'
-        // }, {
-        //     productName: '麵包2',
-        //     unitPrice: 80,
-        //     productImgUrl: '/bakeryImg/02.jpg',
-        //     storageCount: 12,
-        //     ingredients: ['麵粉', '鮮奶', '糖粉'],
-        //     storageDays: 5,
-        //     storageMethod: '24小時內未食用完必須冰冷藏'
-        // }, {
-        //     productName: '麵包3',
-        //     unitPrice: 60,
-        //     productImgUrl: '/bakeryImg/03.jpg',
-        //     storageCount: 7,
-        //     ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
-        //     storageDays: 5,
-        //     storageMethod: '24小時內未食用完必須冰冷藏'
-        // }, {
-        //     productName: '麵包4',
-        //     unitPrice: 110,
-        //     productImgUrl: '/bakeryImg/04.jpg',
-        //     storageCount: 2,
-        //     ingredients: ['無鹽奶油', '鮮奶', '水'],
-        //     storageDays: 3,
-        //     storageMethod: '24小時內未食用完必須冰冷藏'
-        // }, {
-        //     productName: '麵包5',
-        //     unitPrice: 60,
-        //     productImgUrl: '/bakeryImg/05.jpg',
-        //     storageCount: 7,
-        //     ingredients: ['麵粉', '鮮奶', '糖粉', '花生'],
-        //     storageDays: 5,
-        //     storageMethod: '24小時內未食用完必須冰冷藏'
-        // }, {
-        //     productName: '麵包6',
-        //     unitPrice: 110,
-        //     productImgUrl: '/bakeryImg/06.jpg',
-        //     storageCount: 2,
-        //     ingredients: ['無鹽奶油', '鮮奶', '水'],
-        //     storageDays: 3,
-        //     storageMethod: '24小時內未食用完必須冰冷藏'
-        // }, {
-        //     productName: '麵包7',
-        //     unitPrice: 110,
-        //     productImgUrl: '/bakeryImg/07.jpg',
-        //     storageCount: 2,
-        //     ingredients: ['無鹽奶油', '鮮奶', '水'],
-        //     storageDays: 3,
-        //     storageMethod: '24小時內未食用完必須冰冷藏'
-        // }]
-
-        // this.setState({
-        //     newsData: data
-        // })
     }
 
     // 結帳
-    doCheckOut = () => {
-        alert('結帳')
+    doCheckOut = async () => {
+        let profile = {}
+        if (!!localStorage.getItem('profile')) {
+            profile = JSON.parse(localStorage.getItem('profile'));
+
+        }
+
+        console.log('送出訂單:', this.state.orderList);
+        const orderList = JSON.parse(JSON.stringify(this.state.orderList));
+        const body = {
+            orderList,
+            orderTotalPrice: this.state.orderTotalPrice,
+            FUserId: profile.id
+        }
+        await axios.post(Config.apiUrl + '/bakery/order/create', body).then((res) => {
+            console.log(res)
+            if (!!res.data) {
+                switch (res.data.code.toString()) {
+                    case '20000':
+                        this.setState({
+                            orderList: [],
+                            orderTotalPrice: 0,
+                            isOrderListDialogOpen: false
+                        })
+                        this.showSnackbar('success', res.data.message);
+                        break;
+                    case '20099':
+                        this.showSnackbar('error', res.data.message);
+                        break;
+                    default:
+                        break;
+                }
+            } else this.showSnackbar('error', '送出訂單時發生異常，請稍後再嘗試。');
+        })
+
     }
-    componentDidMount = () => {
-        this.getData();
+
+    // 顯示通知框
+    showSnackbar = async (severity, msg) => {
+        await this.setState({
+            snackbarMsg: msg,
+            alertSeverity: severity,
+            isSnackbarOpen: true
+        })
+    }
+
+    // 通知框開關
+    handleSnackbarState(state) {
+        switch (state) {
+            case 'close':
+                this.setState({
+                    isSnackbarOpen: false
+                })
+                break;
+            case 'open':
+                this.setState({
+                    isSnackbarOpen: true
+                })
+                break;
+            default:
+                break;
+        }
+    }
+    componentDidMount = async () => {
+        await this.getData();
     }
 
     render() {
         return (
             <div style={{ width: '100%', padding: '0.5rem' }}>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                    open={this.state.isSnackbarOpen}
+                    autoHideDuration={5000}
+                    onClose={() => { this.handleSnackbarState('close') }}
+                    key={'top center'}
+                >
+                    <Alert onClose={() => { this.handleSnackbarState('close') }} severity={this.state.alertSeverity} sx={{ width: '100%' }}>
+                        {this.state.snackbarMsg}
+                    </Alert>
+                </Snackbar>
                 <Grid container spacing={2}>
                     {
                         this.state.data.map((item, idx) => {
@@ -298,15 +317,15 @@ export default class Bakery extends Component {
                 </Grid>
                 {/* 購物 Dialog */}
                 <Dialog open={this.state.isCartDialogOpen} disableEscapeKeyDown id="cart-dialog" >
-                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.productName}</DialogTitle>
+                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.FName}</DialogTitle>
                     <DialogContent style={{ background: '#959595', color: 'white' }} >
                         {
-                            (this.state.currentProductInfo.storageCount === 0)
+                            (this.state.currentProductInfo.FStorageCount === 0)
                                 ?
                                 <div></div>
                                 :
                                 <div style={{ background: '#959595', color: 'white', marginBottom: '1rem' }} >
-                                    單價：$ {this.state.currentProductInfo.unitPrice}  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 總金額： {this.state.currentProductInfo.unitPrice * this.state.count} 元
+                                    單價：$ {this.state.currentProductInfo.FUnitPrice}  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 總金額： {this.state.currentProductInfo.FUnitPrice * this.state.count} 元
                                 </div>
                         }
                         <div>
@@ -316,7 +335,7 @@ export default class Bakery extends Component {
                     <DialogActions style={{ background: '#959595' }} >
                         <Button color="secondary" onClick={() => { this.closeDialog('cart') }}>取消</Button>
                         {
-                            (this.state.currentProductInfo.storageCount === 0)
+                            (this.state.currentProductInfo.FStorageCount === 0)
                                 ?
                                 <div></div>
                                 :
@@ -347,16 +366,16 @@ export default class Bakery extends Component {
                                             <TableBody>
                                                 {this.state.orderList.map((row, index) => (
                                                     <TableRow
-                                                        key={row.productName}
+                                                        key={row.FName}
                                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                     >
                                                         <TableCell component="th" scope="row">
-                                                            {row.productName}
+                                                            {row.FName}
                                                         </TableCell>
-                                                        <TableCell align="center">{row.unitPrice}</TableCell>
-                                                        <TableCell align="center">{row.count}</TableCell>
-                                                        <TableCell align="center">{row.totalPrice}</TableCell>
-                                                        <TableCell align="center">{row.storageCount}</TableCell>
+                                                        <TableCell align="center">{row.FUnitPrice}</TableCell>
+                                                        <TableCell align="center">{row.FCount}</TableCell>
+                                                        <TableCell align="center">{row.FTotalPrice}</TableCell>
+                                                        <TableCell align="center">{row.FStorageCount}</TableCell>
                                                         <TableCell align="center" >
                                                             <IconButton color="primary" aria-label="upload picture" component="span" onClick={(() => { this.orderListAdd(row, index) })}>
                                                                 <AddIcon />
@@ -375,7 +394,6 @@ export default class Bakery extends Component {
                                     </TableContainer>
 
                                     <Divider />
-                                    消費總金額：{this.state.orderTotalPrice}
                                 </div>
                                 :
                                 <div>
@@ -384,12 +402,24 @@ export default class Bakery extends Component {
                         }
                     </DialogContent>
                     <DialogActions style={{ background: '#959595' }} >
-                        <Button color="secondary" onClick={() => { this.closeDialog('orderList') }}>關閉</Button>
-                        {(this.state.orderList.length > 0)
-                            ?
-                            <Button color="secondary" onClick={this.doCheckOut}>結帳</Button>
-                            :
-                            <div></div>}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                            <div style={{ marginLeft: '0.5rem' }}>
+                                {(this.state.orderList.length > 0)
+                                    ?
+                                    <div>消費總金額：{this.state.orderTotalPrice}</div>
+                                    :
+                                    <div></div>
+                                }
+                            </div>
+                            <div>
+                                <Button color="secondary" onClick={() => { this.closeDialog('orderList') }}>關閉</Button>
+                                {(this.state.orderList.length > 0)
+                                    ?
+                                    <Button color="secondary" onClick={this.doCheckOut}>送出訂單</Button>
+                                    :
+                                    <div></div>}
+                            </div>
+                        </div>
                     </DialogActions>
                 </Dialog>
                 <SpeedDial
@@ -406,7 +436,7 @@ export default class Bakery extends Component {
                         />
                     ))}
                 </SpeedDial>
-            </div>
+            </div >
         )
     }
 }
