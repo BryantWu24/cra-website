@@ -474,6 +474,7 @@ app.post("/bakery/material/create", function async (req, res) {
 app.post("/bakery/item/create", function async (req, res) {
     const body = req.body;
     const FBakeryIngredientId = _uuid();
+    const FBakeryItemId = _uuid();
     const ingredientPromise = new Promise((resolve, reject) => {
         let materialSelectSQL = `SELECT * from bakery_material WHERE `;
         body.FIngredients.forEach((item, index) => {
@@ -504,7 +505,7 @@ app.post("/bakery/item/create", function async (req, res) {
 
     const itemPromise = new Promise((resolve, reject) => {
         const itemBody = {
-            FBakeryItemId: _uuid(),
+            FBakeryItemId,
             FBakeryIngredientId,
             FName: body.FName,
             FUnitPrice: body.FUnitPrice,
@@ -524,7 +525,26 @@ app.post("/bakery/item/create", function async (req, res) {
         });
     });
 
-    Promise.all([ingredientPromise, itemPromise]).then(() => {
+    const storePromise = new Promise((resolve, reject) => {
+        const storeBody = {
+            FBakeryStoreId: _uuid(),
+            FBakeryItemId,
+            FName: body.FName,
+            FCount: body.FStorageCount,
+        }
+        // 新增麵包坊商品紀錄
+        db.query('INSERT INTO bakery_store SET ?', storeBody, function (error, results, fields) {
+            if (error) {
+                console.log('/bakery/item/create - 新增麵包坊庫存紀錄失敗: ', error);
+                reject(error);
+            } else {
+                console.log('/bakery/item/create - 新增麵包坊庫存紀錄成功');
+                resolve();
+            }
+        });
+    });
+
+    Promise.all([ingredientPromise, itemPromise, storePromise]).then(() => {
         console.log('建立商品完成');
         const finalResponse = apiResponse(20000, [body], TEXT.CreateSuccess);
         return res.send(finalResponse)
