@@ -78,9 +78,12 @@ class BakeryManage extends Component {
                                     id: index
                                 })
                             })
-                            this.setState({
-                                data: tableData
-                            })
+                            // fix list disappear when create new item.
+                            setTimeout(() => {
+                                this.setState({
+                                    data: tableData
+                                })
+                            },100)
                             break;
                         default:
                             break;
@@ -264,7 +267,7 @@ class BakeryManage extends Component {
                                     checkboxSelection
                                     onRowClick={this.handleRowClick}
                                     onSelectionModelChange={this.handleSelect}
-                                    selectionModel={this.state.selectItemId} 
+                                    selectionModel={this.state.selectItemId}
                                 />
                             </div>
                         </Grid>
