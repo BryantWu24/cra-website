@@ -116,9 +116,19 @@ export default class Bakery extends Component {
 
     // 接收到代表點擊新增購物按鈕
     handleProductInfo = (info) => {
-        this.setState({
-            currentProductInfo: info,
-            isCartDialogOpen: true
+        const apiBody = {
+            FBakeryItemId: info.FBakeryItemId
+        }
+        axios.post(Config.apiUrl + '/bakery/store/item',apiBody).then((res) => {
+            if (!!res.data) {
+                if (res.data.code === 20000) {
+                    info.FStorageCount = res.data.data[0].FCount;
+                    this.setState({
+                        currentProductInfo: info,
+                        isCartDialogOpen: true
+                    })
+                } else this.showSnackbar('error', '取得庫存數量異常，請稍後再嘗試');
+            } else this.showSnackbar('error', '取得庫存數量異常，請稍後再嘗試');
         })
     }
 

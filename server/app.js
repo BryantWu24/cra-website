@@ -448,6 +448,23 @@ app.post("/bakery/item/update", function async (req, res) {
     });
 })
 
+// 取得指定商品庫存
+app.post("/bakery/store/item", function async (req, res) {
+    const FBakeryItemId = req.body.FBakeryItemId;
+    db.query(`SELECT * from bakery_store WHERE FBakeryItemId = '${FBakeryItemId}'`, function (err, result) {
+        let  finalResponse  ='';
+        if (err) {
+            console.log('/bakery/store/item - 取得指定商品庫存失敗: ', err);
+            finalResponse  =apiResponse(20099, [], TEXT.SearchFail);
+        } else {
+            console.log('/bakery/store/item - 取得指定商品庫存成功');
+             finalResponse = apiResponse(20000, result, TEXT.SearchSuccess);
+        }
+        res.send(finalResponse).end();
+    })
+});
+
+
 // 建立原料
 app.post("/bakery/material/create", function async (req, res) {
     const body = req.body;
