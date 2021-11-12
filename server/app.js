@@ -67,42 +67,41 @@ const TEXT = {
 app.post("/login", function async (req, res) {
     const account = req.body.account;
     const password = req.body.password;
-    db.query(
-        `SELECT * FROM user WHERE FAccount='${account}' AND FPassword='${password}'`,
-        function (err, userRows, fields) {
-            if (err) {
-                console.log('/login API Error Log :', err);
-                const response = apiResponse(20099, [], TEXT.LoginException);
-                return res.send(response);
+
+    db.query(`SELECT u.FUserId , u.FUserName, u.FAvatar, l.FListName, l.FListKey, r.FRoleId, r.FRoleName  FROM user u 
+              LEFT JOIN auth a on  u.FRoleId = a.FRoleId 
+              LEFT JOIN role r on  r.FRoleId = a.FRoleId  
+              LEFT JOIN list l on a.FListId = l.FListId  
+              WHERE u.FAccount='${account}' AND u.FPassword='${password}'`, function (err, result, field) {
+        if (err) {
+            console.log('/login API Error :', err);
+            const response = apiResponse(20099, err, TEXT.LoginException);
+            return res.send(response);
+        } else {
+            if (result.length === 0) {
+                const noDataResponse = apiResponse(20099, [], TEXT.AccountPasswordError);
+                return res.send(noDataResponse);
             } else {
-                if (userRows.length === 0) {
-                    const noDataResponse = apiResponse(20099, [], TEXT.AccountPasswordError);
-                    return res.send(noDataResponse);
-                } else {
-                    db.query(
-                        `SELECT * FROM auth WHERE FRoleId='${userRows[0].FRoleId}'`,
-                        function (err, authRows, fields) {
-                            if (err) {
-                                const response = apiResponse(20099, [], TEXT.SearchAuthFail);
-                                return res.send(response);
-                            } else {
-                                const listAry = [];
-                                authRows.forEach(item => {
-                                    listAry.push({
-                                        key: item.FListKey.toUpperCase(),
-                                        title: item.FListName
-                                    });
-                                });
-                                userRows[0].list = listAry;
-                                const response = apiResponse(20000, userRows, TEXT.LoginSuccess);
-                                return res.send(response);
-                            }
-                        }
-                    )
-                }
+                const listArray = [];
+                result.forEach((item) => {
+                    listArray.push({
+                        key: item.FListKey.toUpperCase(),
+                        title: item.FListName
+                    })
+                })
+                const apiResult = [{
+                    FRoleName: result[0].FRoleName,
+                    FRoleId: result[0].FRoleId,
+                    FUserId: result[0].FUserId,
+                    FUserName: result[0].FUserName,
+                    FAvatar: result[0].FAvatar,
+                    list: listArray
+                }]
+                const response = apiResponse(20000, apiResult, TEXT.LoginSuccess);
+                return res.send(response);
             }
         }
-    );
+    })
 });
 
 // 查整張表
@@ -452,13 +451,13 @@ app.post("/bakery/item/update", function async (req, res) {
 app.post("/bakery/store/item", function async (req, res) {
     const FBakeryItemId = req.body.FBakeryItemId;
     db.query(`SELECT * from bakery_store WHERE FBakeryItemId = '${FBakeryItemId}'`, function (err, result) {
-        let  finalResponse  ='';
+        let finalResponse = '';
         if (err) {
             console.log('/bakery/store/item - 取得指定商品庫存失敗: ', err);
-            finalResponse  =apiResponse(20099, [], TEXT.SearchFail);
+            finalResponse = apiResponse(20099, [], TEXT.SearchFail);
         } else {
             console.log('/bakery/store/item - 取得指定商品庫存成功');
-             finalResponse = apiResponse(20000, result, TEXT.SearchSuccess);
+            finalResponse = apiResponse(20000, result, TEXT.SearchSuccess);
         }
         res.send(finalResponse).end();
     })
