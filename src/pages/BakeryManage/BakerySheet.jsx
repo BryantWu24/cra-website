@@ -38,20 +38,20 @@ class BakerySheet extends Component {
             data: {
                 FBakeryItemId: '',
                 FBakeryIngredientId: '',
-                productName: '',
-                unitPrice: 0,
-                storageCount: 0,
+                FBakeryItemName: '',
+                FUnitPrice: 0,
+                FStorageCount: 0,
                 ingredients: [],
-                storageDays: 0,
-                storageMethod: '',
+                FStorageDays: 0,
+                FStorageMethod: '',
             },
             errorData: {
-                productName: '',
-                unitPrice: '',
-                storageCount: '',
+                FBakeryItemName: '',
+                FUnitPrice: '',
+                FStorageCount: '',
                 ingredients: '',
-                storageDays: '',
-                storageMethod: ''
+                FStorageDays: '',
+                FStorageMethod: ''
             },
             addMaterialInfo: {
                 name: '',
@@ -73,20 +73,20 @@ class BakerySheet extends Component {
         const data = this.props.data[0] || {
             FBakeryItemId: '',
             FBakeryIngredientId: '',
-            productName: '',
-            unitPrice: 0,
-            storageCount: 0,
+            FBakeryItemName: '',
+            FUnitPrice: 0,
+            FStorageCount: 0,
             ingredients: [],
-            storageDays: 0,
-            storageMethod: '',
+            FStorageDays: 0,
+            FStorageMethod: '',
         };
         const errorData = {
-            productName: '',
-            unitPrice: '',
-            storageCount: '',
+            FBakeryItemName: '',
+            FUnitPrice: '',
+            FStorageCount: '',
             ingredients: '',
-            storageDays: '',
-            storageMethod: ''
+            FStorageDays: '',
+            FStorageMethod: ''
         }
         const mode = this.props.mode || 'create';
         await this.setState({
@@ -103,7 +103,7 @@ class BakerySheet extends Component {
         if (addMaterialInfo.name.trim().length > 0) {
             await axios
                 .post(Config.apiUrl + "/bakery/material/create", {
-                    FName: addMaterialInfo.name.trim(),
+                    FBakeryMaterialName: addMaterialInfo.name.trim(),
                 })
                 .then((res) => {
 
@@ -163,12 +163,12 @@ class BakerySheet extends Component {
         else {
             const itemData = this.state.data;
             const request = {};
-            request.FName = itemData.productName;
-            request.FUnitPrice = itemData.unitPrice;
-            request.FStorageCount = itemData.storageCount;
-            request.FStorageDays = itemData.storageDays;
-            request.FStorageMethod = itemData.storageMethod;
-            request.FIngredients = itemData.ingredients;
+            request.FBakeryItemName = itemData.FBakeryItemName;
+            request.FUnitPrice = itemData.FUnitPrice;
+            request.FStorageCount = itemData.FStorageCount;
+            request.FStorageDays = itemData.FStorageDays;
+            request.FStorageMethod = itemData.FStorageMethod;
+            request.ingredients = itemData.ingredients;
             request.FBakeryItemId = itemData.FBakeryItemId;
             request.FBakeryIngredientId = itemData.FBakeryIngredientId;
 
@@ -202,12 +202,12 @@ class BakerySheet extends Component {
                                     const data = {
                                         FBakeryIngredientId: res.data.data[0].FBakeryIngredientId,
                                         FBakeryItemId: res.data.data[0].FBakeryItemId,
-                                        ingredients: res.data.data[0].FIngredients,
-                                        productName: res.data.data[0].FName,
-                                        storageCount: res.data.data[0].FStorageCount,
-                                        storageDays: res.data.data[0].FStorageDays,
-                                        storageMethod: res.data.data[0].FStorageMethod,
-                                        unitPrice: res.data.data[0].FUnitPrice
+                                        ingredients: res.data.data[0].ingredients,
+                                        FBakeryItemName: res.data.data[0].FBakeryItemName,
+                                        FStorageCount: res.data.data[0].FStorageCount,
+                                        FStorageDays: res.data.data[0].FStorageDays,
+                                        FStorageMethod: res.data.data[0].FStorageMethod,
+                                        FUnitPrice: res.data.data[0].FUnitPrice
                                     }
                                     this.setState({
                                         data
@@ -257,7 +257,7 @@ class BakerySheet extends Component {
         keyArray.forEach((key) => {
             let value = this.state.data[key];
             switch (key) {
-                case 'unitPrice':
+                case 'FUnitPrice':
                     // 去除開頭為0
                     value = parseInt(value.toString().replace(/0*(\d+)/, "$1"));
                     // 判斷是否有小數
@@ -265,8 +265,8 @@ class BakerySheet extends Component {
                     else if (value === 0) errorData[key] = '單價需輸入大於 0 的數字';
                     else errorData[key] = ''
                     break;
-                case 'storageCount':
-                case 'storageDays':
+                case 'FStorageCount':
+                case 'FStorageDays':
                     // 去除開頭為0
                     value = parseInt(value.toString().replace(/0*(\d+)/, "$1"));
                     // 判斷是否有小數
@@ -356,10 +356,10 @@ class BakerySheet extends Component {
                         label="商品名稱"
                         variant="outlined"
                         fullWidth
-                        onChange={($event) => { this.handleChange('productName', $event) }}
-                        value={this.state.data.productName}
-                        error={(this.state.errorData?.productName?.length > 0 && !!this.state.hasDoSave)} />
-                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.productName}</div>
+                        onChange={($event) => { this.handleChange('FBakeryItemName', $event) }}
+                        value={this.state.data.FBakeryItemName}
+                        error={(this.state.errorData?.FBakeryItemName?.length > 0 && !!this.state.hasDoSave)} />
+                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.FBakeryItemName}</div>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={2}>
                     <TextField
@@ -367,10 +367,10 @@ class BakerySheet extends Component {
                         label="單價"
                         type="number" variant="outlined"
                         fullWidth
-                        onChange={($event) => { this.handleChange('unitPrice', $event) }}
-                        value={this.state.data.unitPrice}
-                        error={(this.state.errorData?.unitPrice?.length > 0 && !!this.state.hasDoSave)} />
-                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.unitPrice}</div>
+                        onChange={($event) => { this.handleChange('FUnitPrice', $event) }}
+                        value={this.state.data.FUnitPrice}
+                        error={(this.state.errorData?.FUnitPrice?.length > 0 && !!this.state.hasDoSave)} />
+                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.FUnitPrice}</div>
                 </Grid >
                 <Grid item xs={12} sm={6} md={4} lg={2}>
                     <TextField
@@ -379,10 +379,10 @@ class BakerySheet extends Component {
                         type="number"
                         variant="outlined"
                         fullWidth
-                        onChange={($event) => { this.handleChange('storageCount', $event) }}
-                        value={this.state.data.storageCount}
-                        error={(this.state.errorData?.storageCount?.length > 0 && !!this.state.hasDoSave)} />
-                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.storageCount}</div>
+                        onChange={($event) => { this.handleChange('FStorageCount', $event) }}
+                        value={this.state.data.FStorageCount}
+                        error={(this.state.errorData?.FStorageCount?.length > 0 && !!this.state.hasDoSave)} />
+                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.FStorageCount}</div>
                 </Grid >
                 <Grid item xs={12} sm={6} md={4} lg={2}>
                     <TextField
@@ -391,10 +391,10 @@ class BakerySheet extends Component {
                         type="number"
                         variant="outlined"
                         fullWidth
-                        onChange={($event) => { this.handleChange('storageDays', $event) }}
-                        value={this.state.data.storageDays}
-                        error={(this.state.errorData?.storageDays?.length > 0 && !!this.state.hasDoSave)} />
-                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.storageDays}</div>
+                        onChange={($event) => { this.handleChange('FStorageDays', $event) }}
+                        value={this.state.data.FStorageDays}
+                        error={(this.state.errorData?.FStorageDays?.length > 0 && !!this.state.hasDoSave)} />
+                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.FStorageDays}</div>
                 </Grid >
                 <Grid item xs={12} sm={6} md={4} lg={2}>
                     <TextField
@@ -402,10 +402,10 @@ class BakerySheet extends Component {
                         label="保存方法"
                         variant="outlined"
                         fullWidth
-                        onChange={($event) => { this.handleChange('storageMethod', $event) }}
-                        value={this.state.data.storageMethod}
-                        error={(this.state.errorData?.storageMethod?.length > 0 && !!this.state.hasDoSave)} />
-                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.storageMethod}</div>
+                        onChange={($event) => { this.handleChange('FStorageMethod', $event) }}
+                        value={this.state.data.FStorageMethod}
+                        error={(this.state.errorData?.FStorageMethod?.length > 0 && !!this.state.hasDoSave)} />
+                    <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.FStorageMethod}</div>
                 </Grid >
                 <Grid item xs={12} sm={9} md={10} lg={10}>
                     <FormControl sx={{ width: '100%' }}>
@@ -433,9 +433,9 @@ class BakerySheet extends Component {
                             {this.state.materialData.map((item) => (
                                 <MenuItem
                                     key={item.FBakeryMaterialId}
-                                    value={item.FName}
+                                    value={item.FBakeryMaterialName}
                                 >
-                                    {item.FName}
+                                    {item.FBakeryMaterialName}
                                 </MenuItem>
                             ))}
                         </Select>

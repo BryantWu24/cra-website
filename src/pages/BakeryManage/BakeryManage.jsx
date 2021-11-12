@@ -67,12 +67,12 @@ class BakeryManage extends Component {
                             const tableData = []
                             data.forEach((item, index) => {
                                 tableData.push({
-                                    productName: item.FName,
-                                    unitPrice: item.FUnitPrice,
-                                    storageCount: item.FStorageCount,
+                                    FBakeryItemName: item.FBakeryItemName,
+                                    FUnitPrice: item.FUnitPrice,
+                                    FStorageCount: item.FStorageCount,
                                     ingredients: item.ingredients,
-                                    storageDays: item.FStorageDays,
-                                    storageMethod: item.FStorageMethod,
+                                    FStorageDays: item.FStorageDays,
+                                    FStorageMethod: item.FStorageMethod,
                                     FBakeryIngredientId: item.FBakeryIngredientId,
                                     FBakeryItemId: item.FBakeryItemId,
                                     id: index
@@ -186,29 +186,29 @@ class BakeryManage extends Component {
     render() {
         const columns = [
             { field: 'id', headerName: 'ID', width: 50 },
-            { field: 'productName', headerName: '名稱', width: 150 },
+            { field: 'FBakeryItemName', headerName: '名稱', width: 150 },
             { field: 'ingredients', headerName: '成分', width: 150, sortable: false, },
             {
-                field: 'storageDays',
+                field: 'FStorageDays',
                 headerName: '保存天數',
                 type: 'number',
                 width: 80,
             },
             {
-                field: 'storageMethod',
+                field: 'FStorageMethod',
                 headerName: '保存方法',
                 description: '各種商品保存方法皆不同，請特別注意',
                 sortable: false,
                 width: 200,
             },
             {
-                field: 'unitPrice',
+                field: 'FUnitPrice',
                 headerName: '單價',
                 type: 'number',
                 width: 50,
             },
             {
-                field: 'storageCount',
+                field: 'FStorageCount',
                 headerName: '庫存',
                 type: 'number',
                 width: 50,

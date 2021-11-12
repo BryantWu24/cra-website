@@ -119,10 +119,10 @@ export default class Bakery extends Component {
         const apiBody = {
             FBakeryItemId: info.FBakeryItemId
         }
-        axios.post(Config.apiUrl + '/bakery/store/item',apiBody).then((res) => {
+        axios.post(Config.apiUrl + '/bakery/item/item',apiBody).then((res) => {
             if (!!res.data) {
                 if (res.data.code === 20000) {
-                    info.FStorageCount = res.data.data[0].FCount;
+                    info.FStorageCount = res.data.data[0].FStorageCount;
                     this.setState({
                         currentProductInfo: info,
                         isCartDialogOpen: true

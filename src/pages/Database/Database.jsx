@@ -38,7 +38,7 @@ class Database extends Component {
             isLoading: true
         }, async () => {
             await this.getTableNameData();
-            await this.getTableData(this.state.tableNameData[0].replace('_', '/'));
+            await this.getTableData(this.state.tableNameData[0].replaceAll('_', '/'));
         })
     }
 
@@ -49,7 +49,7 @@ class Database extends Component {
             isLoading: true
         })
         const tableNameData = this.state.tableNameData;
-        const tableName = tableNameData[value].replace('_', '/')
+        const tableName = tableNameData[value].replaceAll('_', '/')
         this.getTableData(tableName);
     }
 
