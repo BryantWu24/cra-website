@@ -41,6 +41,7 @@ import Tool from '../Tool/Tool';
 import Home from '../Home/Home';
 import Bakery from '../Bakery/Bakery';
 import BakeryManage from '../BakeryManage/BakeryManage';
+import BakeryOrder from '../BakeryOrder/BakeryOrder';
 import Database from '../Database/Database';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import Snackbar from '@mui/material/Snackbar';
@@ -207,6 +208,8 @@ class Backend extends Component {
                 return <Bakery />
             case 'BAKERY MANAGE':
                 return <BakeryManage />
+            case 'BAKERY ORDER':
+                return <BakeryOrder />
             case 'DATABASE':
                 return <Database />
             default:
@@ -375,7 +378,7 @@ class Backend extends Component {
                                 profile.isLogin = true;
                                 result.profile = profile;
                                 result.isLogInDialogOpen = false;
-                                localStorage.setItem('profile',JSON.stringify(profile));
+                                localStorage.setItem('profile', JSON.stringify(profile));
                                 this.setState(result)
                                 const snackbarMsg = '歡迎 ' + data.FUserName + ' 蒞臨本網站';
                                 this.showSnackbar('success', snackbarMsg);

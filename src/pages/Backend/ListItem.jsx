@@ -19,6 +19,10 @@ export const mainListItems = [
         key: "BAKERY MANAGE",
         title: 'BakeryManage'
     }, {
+        icon: <SettingsApplicationsIcon />,
+        key: "BAKERY ORDER",
+        title: 'BakeryOrder'
+    }, {
         icon: <BuildIcon />,
         key: "TOOL",
         title: 'Tool'
