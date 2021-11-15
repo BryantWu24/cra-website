@@ -46,7 +46,7 @@ class BakeryCard extends Component {
                 </Backdrop>
                 <Card sx={{ maxWidth: 345 }}>
                     <CardHeader
-                        title={this.props.data.FName}
+                        title={this.props.data.FBakeryItemName}
                         action={
                             <IconButton aria-label="add to cart" onClick={this.passInfo} disabled={!this.props.data.FStorageCount}>
                                 <AddShoppingCartIcon />

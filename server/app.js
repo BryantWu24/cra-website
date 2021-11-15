@@ -13,7 +13,7 @@ const app = express();
 const port = 7000;
 const cors = require('cors');
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3001',
     credentials: true,
     optionSuccessStatus: 200
 }
@@ -35,6 +35,7 @@ const apiResponse = (code, data, message) => {
             res.message = message;
             break;
         case '20099':
+            res.data = data || 'No Error Log';
             res.message = message;
             break;
         default:
@@ -493,7 +494,7 @@ app.post("/bakery/item/create", function async (req, res) {
     body.FBakeryItemId = FBakeryItemId;
     const ingredientPromise = new Promise((resolve, reject) => {
         let materialSelectSQL = `SELECT * from bakery_material WHERE `;
-        body.FIngredients.forEach((item, index) => {
+        body.ingredients.forEach((item, index) => {
             if (index === 0) materialSelectSQL += `FBakeryMaterialName = '${item}'`;
             else materialSelectSQL += ` OR FBakeryMaterialName = '${item}'`
         })
@@ -547,7 +548,7 @@ app.post("/bakery/item/create", function async (req, res) {
         const finalResponse = apiResponse(20000, [body], TEXT.CreateSuccess);
         return res.send(finalResponse)
     }).catch((e) => {
-        const finalResponse = apiResponse(20099, [], TEXT.CreateFail);
+        const finalResponse = apiResponse(20099, e, TEXT.CreateFail);
         return res.send(finalResponse)
     })
 
