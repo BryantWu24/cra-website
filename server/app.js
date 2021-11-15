@@ -7,6 +7,7 @@
 // code: 20000 - 執行成功 
 // code: 20099 - 執行失敗，會帶入 message
 
+const fs = require('fs'); // 載入File System module
 const express = require("express");
 const db = require('./config/db');
 const app = express();
@@ -22,7 +23,6 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`RUN http://localhost:${port}`);
-
 });
 
 const apiResponse = (code, data, message) => {
@@ -75,11 +75,12 @@ app.post("/login", function async (req, res) {
               LEFT JOIN list l on a.FListId = l.FListId  
               WHERE u.FAccount='${account}' AND u.FPassword='${password}'`, function (err, result, field) {
         if (err) {
-            console.log('/login API Error :', err);
+            writeLogToFile('/login API Error :' + err, true)
             const response = apiResponse(20099, err, TEXT.LoginException);
             return res.send(response);
         } else {
             if (result.length === 0) {
+                writeLogToFile('/login API Error : 查無帳號密碼', true)
                 const noDataResponse = apiResponse(20099, [], TEXT.AccountPasswordError);
                 return res.send(noDataResponse);
             } else {
@@ -98,6 +99,7 @@ app.post("/login", function async (req, res) {
                     FAvatar: result[0].FAvatar,
                     list: listArray
                 }]
+                writeLogToFile('/login API : ' + result[0].FRoleName + TEXT.LoginSuccess)
                 const response = apiResponse(20000, apiResult, TEXT.LoginSuccess);
                 return res.send(response);
             }
@@ -109,9 +111,10 @@ app.post("/login", function async (req, res) {
 const querySelectList = (tableName, resFunction) => {
     const res = db.query(`SELECT * FROM ${tableName}`, function (err, rows, fields) {
         if (err) {
-            console.log('Search ' + tableName + ' Table Error Log :', err);
+            writeLogToFile('Search ' + tableName + ' Table Error Log :' + err, true)
             throw err;
         } else {
+            writeLogToFile('Search ' + tableName + ' Table : ' + TEXT.SearchSuccess)
             const response = apiResponse(20000, rows, TEXT.SearchSucces);
             return resFunction.send(response);
         }
@@ -123,8 +126,13 @@ const querySelectList = (tableName, resFunction) => {
 app.post('/db/table', function async (req, res) {
     db.query(`select TABLE_NAME from information_schema.tables where TABLE_SCHEMA='cra-website'`, function async (err, tableName, fields) {
         let response;
-        if (err) response = apiResponse(20099, [], TEXT.SearchFail);
-        else response = apiResponse(20000, tableName, TEXT.SearchSuccess);
+        if (err) {
+            writeLogToFile('/db/table Error : ' + err, true);
+            response = apiResponse(20099, [], TEXT.SearchFail);
+        } else {
+            writeLogToFile('/db/table : ' + TEXT.SearchSuccess);
+            response = apiResponse(20000, tableName, TEXT.SearchSuccess);
+        }
         res.send(response);
     })
 })
@@ -181,10 +189,10 @@ app.post("/bakery/item/item", function async (req, res) {
     db.query(`SELECT * from bakery_item WHERE FBakeryItemId = '${FBakeryItemId}'`, function (err, result) {
         let finalResponse = '';
         if (err) {
-            console.log('/bakery/item/item - 取得指定商品庫存失敗: ', err);
+            writeLogToFile('/bakery/item/item - 取得指定商品庫存失敗 : ' + err, true);
             finalResponse = apiResponse(20099, [], TEXT.SearchFail);
         } else {
-            console.log('/bakery/item/item - 取得指定商品庫存成功');
+            writeLogToFile('/bakery/item/item - 取得指定商品庫存成功');
             finalResponse = apiResponse(20000, result, TEXT.SearchSuccess);
         }
         res.send(finalResponse).end();
@@ -197,7 +205,7 @@ app.post("/bakery/item/list", function async (req, res) {
               LEFT JOIN bakery_ingredients s on m.FBakeryIngredientId = s.FBakeryIngredientId 
               LEFT JOIN bakery_material l on s.FBakeryMaterialId = l.FBakeryMaterialId`, function (err, result) {
         if (err) {
-            console.log('/bakery/item/list API Error : ', err);
+            writeLogToFile('/bakery/item/list API Error : ' + err, true);
             const finalResponse = apiResponse(20000, err, TEXT.SearchFail);
             res.send(finalResponse);
         } else {
@@ -213,6 +221,7 @@ app.post("/bakery/item/list", function async (req, res) {
                 }
             })
             const apiResult = Object.values(resultObj);
+            writeLogToFile('/bakery/item/list API : ' + TEXT.SearchSucces);
             const finalResponse = apiResponse(20000, apiResult, TEXT.SearchSucces);
             res.send(finalResponse);
 
@@ -228,11 +237,12 @@ app.post("/user/create", function async (req, res) {
     db.query('INSERT INTO user SET ?', body, function (err, results, fields) {
         let finalResponse;
         if (err) {
-            console.log('/user/create Error Log : ', err);
+            writeLogToFile('/user/create Error : ' + err, true);
             finalResponse = apiResponse(20099, [], TEXT.RegisterFail);
         } else {
             delete body.FAccount;
             delete body.FPassword;
+            writeLogToFile('/user/create : ' + TEXT.RegisterSuccess);
             finalResponse = apiResponse(20000, [body], TEXT.RegisterSuccess);
         }
         return res.send(finalResponse)
@@ -252,10 +262,10 @@ app.post("/bakery/item/delete", function async (req, res) {
         })
         db.query(sql, [apiBody], function (err, result, fields) {
             if (err) {
-                console.log('/bakery/item/delete - 刪除成分失敗:', err);
+                writeLogToFile('/bakery/item/delete - 刪除成分失敗 : ' + err, true);
                 reject(err);
             } else {
-                console.log('/bakery/item/delete - 刪除成分成功:');
+                writeLogToFile('/bakery/item/delete - 刪除成分成功');
                 resolve();
             }
         });
@@ -270,10 +280,10 @@ app.post("/bakery/item/delete", function async (req, res) {
         })
         db.query(sql, [apiBody], function (err, result, fields) {
             if (err) {
-                console.log('/bakery/item/delete - 刪除商品失敗:', err);
+                writeLogToFile('/bakery/item/delete - 刪除商品失敗 : ' + err, true);
                 reject();
             } else {
-                console.log('/bakery/item/delete - 刪除商品成功:');
+                writeLogToFile('/bakery/item/delete - 刪除商品成功');
                 resolve();
             }
         });
@@ -282,7 +292,7 @@ app.post("/bakery/item/delete", function async (req, res) {
         const finalResponse = apiResponse(20000, [], TEXT.DeleteSuccess);
         res.send(finalResponse).end();
     }).catch((e) => {
-        console.log('/bakery/item/delete - 刪除商品是常:', e);
+        writeLogToFile('/bakery/item/delete - 刪除商品異常 : ' + e, true);
     })
 })
 
@@ -297,41 +307,39 @@ app.post("/bakery/item/update", function async (req, res) {
     const updateItem = new Promise((resolve, reject) => {
         db.query('update bakery_item set ? where FBakeryItemId = ?', [body, body.FBakeryItemId], function (err, fields) {
             if (err) {
-                console.log('/bakery/item/update - 更新商品失敗:', err);
+                writeLogToFile('/bakery/item/update - 更新商品失敗 : ' + err, true);
                 reject(err);
             } else {
-                console.log('/bakery/item/update - 更新商品成功');
+                writeLogToFile('/bakery/item/update - 更新商品成功');
                 resolve();
             }
         });
     });
 
     // 更新庫存
-    const storePromise = new Promise((resolve, reject) => {
-        const apiBody = {
-            FName: body.FName,
-            FCount: body.FStorageCount
-        }
-        db.query('update bakery_store set ? where FBakeryItemId = ?', [apiBody, body.FBakeryItemId], function (err, fields) {
-            if (err) {
-                console.log('/bakery/item/update - 更新庫存失敗:', err);
-                reject(err);
-            } else {
-                console.log('/bakery/item/update - 更新庫存成功');
-                resolve();
-            }
-        });
-    });
+    // const storePromise = new Promise((resolve, reject) => {
+    //     const apiBody = {
+    //         FName: body.FName,
+    //         FCount: body.FStorageCount
+    //     }
+    //     db.query('update bakery_store set ? where FBakeryItemId = ?', [apiBody, body.FBakeryItemId], function (err, fields) {
+    //         if (err) {
+    //             reject(err);
+    //         } else {
+    //             resolve();
+    //         }
+    //     });
+    // });
 
     // 取得所有原料
     const getAllMaterial = new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_material`, function (err, rows, fields) {
             if (err) {
-                console.log('/bakery/item/update - 取得所有原料失敗:', err);
+                writeLogToFile('/bakery/item/update - 取得所有原料失敗 : ' + err, true);
                 reject(err)
             } else {
                 allMaterial = rows;
-                console.log('/bakery/item/update - 取得所有原料成功');
+                writeLogToFile('/bakery/item/update - 取得所有原料成功');
                 resolve(allMaterial);
             }
         });
@@ -341,17 +349,17 @@ app.post("/bakery/item/update", function async (req, res) {
     const getCurMaterial = new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_ingredients WHERE FBakeryIngredientId = '${body.FBakeryIngredientId}'`, function (err, rows, fields) {
             if (err) {
-                console.log('/bakery/item/update - 取得現有組成成分失敗:', err);
+                writeLogToFile('/bakery/item/update - 取得現有組成成分失敗 : ' + err, true);
                 reject(err)
             } else {
                 curMaterial = rows;
-                console.log('/bakery/item/update - 取得現有組成成分成功:');
+                writeLogToFile('/bakery/item/update - 取得現有組成成分成功');
                 resolve(curMaterial)
             }
         });
     });
 
-    Promise.all([updateItem, getAllMaterial, getCurMaterial, storePromise]).then(() => {
+    Promise.all([updateItem, getAllMaterial, getCurMaterial]).then(() => {
         const action = {
             insert: [],
             delete: [],
@@ -406,10 +414,10 @@ app.post("/bakery/item/update", function async (req, res) {
 
                 db.query(sql, [apiBody], function (err, fields) {
                     if (err) {
-                        console.log('/bakery/item/update - 新增組成成分失敗:', err);
+                        writeLogToFile('/bakery/item/update - 新增組成成分失敗 : ' + err, true);
                         reject(err);
                     } else {
-                        console.log('/bakery/item/update - 新增組成成分成功:');
+                        writeLogToFile('/bakery/item/update - 新增組成成分成功');
                         resolve();
                     }
                 });
@@ -426,10 +434,10 @@ app.post("/bakery/item/update", function async (req, res) {
                     })
                     db.query(sql, [apiBody], function (err, result, fields) {
                         if (err) {
-                            console.log('/bakery/item/update - 刪除組成成分失敗:', err);
+                            writeLogToFile('/bakery/item/update - 刪除組成成分失敗:' + err, true);
                             insertPromise.reject(err);
                         } else {
-                            console.log('/bakery/item/update - 刪除組成成分成功:');
+                            writeLogToFile('/bakery/item/update - 刪除組成成分成功');
                             const finalResponse = apiResponse(20000, [], TEXT.SaveSuccess);
                             res.send(finalResponse).end();
                         }
@@ -447,9 +455,9 @@ app.post("/bakery/item/update", function async (req, res) {
 
             db.query(sql, [apiBody], function (err, result, fields) {
                 if (err) {
-                    console.log('/bakery/item/update - 刪除組成成分失敗:', err);
+                    writeLogToFile('/bakery/item/update - 刪除組成成分失敗:' + err, true);
                 } else {
-                    console.log('/bakery/item/update - 刪除組成成分成功:');
+                    writeLogToFile('/bakery/item/update - 刪除組成成分成功');
                     const finalResponse = apiResponse(20000, [], TEXT.SaveSuccess);
                     res.send(finalResponse).end();
                 }
@@ -470,8 +478,11 @@ app.post("/bakery/material/create", function async (req, res) {
     db.query(`SELECT * from bakery_material WHERE FBakeryMaterialName = '${body.FBakeryMaterialName}'`, function (err, rows, field) {
         if (rows.length === 0) {
             db.query('INSERT INTO bakery_material SET ?', body, function (err, results, fields) {
-                if (err) throw err;
-                else {
+                if (err) {
+                    writeLogToFile('/bakery/material/create - 建立原料失敗 : ' + err, true);
+                    throw err;
+                } else {
+                    writeLogToFile('/bakery/material/create - 建立原料成功');
                     const finalResponse = apiResponse(20000, [body], TEXT.CreateSuccess);
                     return res.send(finalResponse)
                 }
@@ -508,10 +519,10 @@ app.post("/bakery/item/create", function async (req, res) {
                 };
                 db.query('INSERT INTO bakery_ingredients SET ?', ingredientsBody, function (err, results, fields) {
                     if (err) {
-                        console.log('/bakery/item/create - 新增麵包坊組成成分紀錄失敗: ', err);
+                        writeLogToFile('/bakery/item/create - 新增麵包坊組成成分紀錄失敗: ' + err, true);
                         reject(err);
                     } else {
-                        console.log('/bakery/item/create - 新增麵包坊組成成分紀錄成功');
+                        writeLogToFile('/bakery/item/create - 新增麵包坊組成成分紀錄成功');
                         resolve();
                     }
                 });
@@ -533,7 +544,7 @@ app.post("/bakery/item/create", function async (req, res) {
         // 新增麵包坊商品紀錄
         db.query('INSERT INTO bakery_item SET ?', itemBody, function (err, results, fields) {
             if (err) {
-                console.log('/bakery/item/create - 新增麵包坊商品紀錄失敗: ', err);
+                writeLogToFile('/bakery/item/create - 新增麵包坊商品紀錄失敗: ' + err, true);
                 reject(err);
             } else {
                 console.log('/bakery/item/create - 新增麵包坊商品紀錄成功');
@@ -568,10 +579,10 @@ app.post("/bakery/order/create", function async (req, res) {
         // 新增麵包坊銷售紀錄
         db.query('INSERT INTO bakery_order SET ?', apiBody, function (err, result) {
             if (err) {
-                console.log('新增麵包坊銷售紀錄失敗:', err);
+                writeLogToFile('/bakery/order/create - 新增麵包坊銷售紀錄失敗: ' + err, true);
                 reject(err);
             } else {
-                console.log('新增麵包坊銷售紀錄成功，FOrderId :', FOrderId);
+                writeLogToFile('/bakery/order/create - 新增麵包坊銷售紀錄成功，FOrderId :', FOrderId);
                 resolve(FOrderId)
             }
         });
@@ -588,12 +599,12 @@ app.post("/bakery/order/create", function async (req, res) {
 
         db.query(sql, [apiBody], function (err, result) {
             let response;
-            if (!err) {
-                console.log('新增麵包坊銷售明細成功');
-                response = apiResponse(20000, [], TEXT.CheckOutSuccess);
-            } else {
-                console.log('新增麵包坊銷售明細失敗:', err);
+            if (err) {
+                writeLogToFile('/bakery/order/create - 新增麵包坊銷售明細失敗:', err);
                 response = apiResponse(20099, [], TEXT.CheckOutFail);
+            } else {
+                writeLogToFile('/bakery/order/create - 新增麵包坊銷售明細成功');
+                response = apiResponse(20000, [], TEXT.CheckOutSuccess);
             }
             res.send(response);
         });
@@ -602,7 +613,6 @@ app.post("/bakery/order/create", function async (req, res) {
     })
 
 });
-
 
 // 產生 UUID
 function _uuid() {
@@ -614,5 +624,20 @@ function _uuid() {
         var r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+// 寫 Log 檔
+function writeLogToFile(log, hasError) {
+    const parselog = (typeof (log) === 'object') ? JSON.stringify(log) : log.toString();
+    const message = new Date().toString() + ' : ' + parselog + ' \r\n';
+    if (hasError) {
+        fs.appendFile('./error-log.txt', message, function (err) {
+            if (err) throw err;
+        });
+    }
+
+    fs.appendFile('./log.txt', message, function (err) {
+        if (err) throw err;
     });
 }
