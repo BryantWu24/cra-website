@@ -7,6 +7,9 @@
 // code: 20000 - 執行成功 
 // code: 20099 - 執行失敗，會帶入 message
 
+// /openapi/ 路徑代表有使用 sql 去 mapping 其他表
+
+
 const fs = require('fs'); // 載入File System module
 const express = require("express");
 const db = require('./config/db');
@@ -23,6 +26,12 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`RUN http://localhost:${port}`);
+    fs.unlink('error-log.txt', function () {
+        console.log('已經刪除 error-log.txt 檔案!');
+    });
+    fs.unlink('log.txt', function () {
+        console.log('已經刪除 log.txt 檔案!');
+    });
 });
 
 const apiResponse = (code, data, message) => {
@@ -200,12 +209,12 @@ app.post("/bakery/item/item", function async (req, res) {
 });
 
 // 取得麵包坊列表 (OK)
-app.post("/bakery/item/list", function async (req, res) {
+app.post("/openapi/bakery/item/list", function async (req, res) {
     db.query(`SELECT * FROM bakery_item m 
               LEFT JOIN bakery_ingredients s on m.FBakeryIngredientId = s.FBakeryIngredientId 
               LEFT JOIN bakery_material l on s.FBakeryMaterialId = l.FBakeryMaterialId`, function (err, result) {
         if (err) {
-            writeLogToFile('/bakery/item/list API Error : ' + err, true);
+            writeLogToFile('/openapi/bakery/item/list API Error : ' + err, true);
             const finalResponse = apiResponse(20000, err, TEXT.SearchFail);
             res.send(finalResponse);
         } else {
@@ -221,7 +230,7 @@ app.post("/bakery/item/list", function async (req, res) {
                 }
             })
             const apiResult = Object.values(resultObj);
-            writeLogToFile('/bakery/item/list API : ' + TEXT.SearchSucces);
+            writeLogToFile('/openapi/bakery/item/list API : ' + TEXT.SearchSucces);
             const finalResponse = apiResponse(20000, apiResult, TEXT.SearchSucces);
             res.send(finalResponse);
 

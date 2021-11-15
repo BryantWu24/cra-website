@@ -224,7 +224,7 @@ export default class Bakery extends Component {
 
     // 取得資料
     getData = async () => {
-        await axios.post(Config.apiUrl + '/bakery/item/list').then((res) => {
+        await axios.post(Config.apiUrl + '/openapi/bakery/item/list').then((res) => {
             console.log(res)
             const data = JSON.parse(JSON.stringify(res.data.data))
             if (res.data.code === 20000) {

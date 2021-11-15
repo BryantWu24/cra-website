@@ -57,7 +57,7 @@ class BakeryManage extends Component {
     // 取得商品清單
     getBakeryItem = async () => {
         await axios
-            .post(Config.apiUrl + "/bakery/item/list")
+            .post(Config.apiUrl + "/openapi/bakery/item/list")
             .then((res) => {
                 if (!!res.data) {
                     switch (res.data.code.toString()) {
