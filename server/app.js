@@ -9,7 +9,7 @@
 
 // /openapi/ 路徑代表有使用 sql 去 mapping 其他表
 
-
+const mysql = require("mysql");
 const fs = require('fs'); // 載入File System module
 const express = require("express");
 const db = require('./config/db');
@@ -325,21 +325,6 @@ app.post("/bakery/item/update", function async (req, res) {
         });
     });
 
-    // 更新庫存
-    // const storePromise = new Promise((resolve, reject) => {
-    //     const apiBody = {
-    //         FName: body.FName,
-    //         FCount: body.FStorageCount
-    //     }
-    //     db.query('update bakery_store set ? where FBakeryItemId = ?', [apiBody, body.FBakeryItemId], function (err, fields) {
-    //         if (err) {
-    //             reject(err);
-    //         } else {
-    //             resolve();
-    //         }
-    //     });
-    // });
-
     // 取得所有原料
     const getAllMaterial = new Promise((resolve, reject) => {
         db.query(`SELECT * FROM bakery_material`, function (err, rows, fields) {
@@ -576,7 +561,7 @@ app.post("/bakery/item/create", function async (req, res) {
 });
 
 // 建立麵包坊銷售紀錄
-app.post("/bakery/order/create", function async (req, res) {
+app.post("/openapi/bakery/order/create", function async (req, res) {
     const body = req.body;
     const FOrderId = _uuid();
     const promise = new Promise((resolve, reject) => {
@@ -599,10 +584,10 @@ app.post("/bakery/order/create", function async (req, res) {
 
     promise.then((FOrderId) => {
         // 新增麵包坊銷售明細
-        const sql = `INSERT INTO bakery_order_detail (FOrderDetailId,FOrderId,FBakeryItemId,FName,FCount,FUnitPrice,FTotalPrice) VALUES ?`;
+        const sql = `INSERT INTO bakery_order_detail (FOrderDetailId,FOrderId,FBakeryItemId,FBakeryItemName,FCount,FUnitPrice,FTotalPrice) VALUES ?`;
         const apiBody = [];
         body.orderList.forEach((item) => {
-            const rowBody = [_uuid(), FOrderId, item.FBakeryItemId, item.FName, item.FCount, item.FUnitPrice, item.FTotalPrice];
+            const rowBody = [_uuid(), FOrderId, item.FBakeryItemId, item.FBakeryItemName, item.FCount, item.FUnitPrice, item.FTotalPrice];
             apiBody.push(rowBody);
         })
 
@@ -610,15 +595,31 @@ app.post("/bakery/order/create", function async (req, res) {
             let response;
             if (err) {
                 writeLogToFile('/bakery/order/create - 新增麵包坊銷售明細失敗:', err);
-                response = apiResponse(20099, [], TEXT.CheckOutFail);
             } else {
                 writeLogToFile('/bakery/order/create - 新增麵包坊銷售明細成功');
+            }
+        });
+    }).then(() => {
+        const sql = 'UPDATE bakery_item SET FStorageCount = ? WHERE FBakeryItemId = ?';
+        let sqls = '';
+        body.orderList.forEach((item) => {
+            const storageCOunt = item.FStorageCount - item.FCount;
+            const rowBody = [storageCOunt, item.FBakeryItemId];
+            sqls += mysql.format(sql, rowBody) + ';';
+        })
+        // 更新商品庫存
+        db.query(sqls, function (err, restuls, fields) {
+            let response;
+            if (err) {
+                writeLogToFile('/bakery/order/create - 更新麵包坊商品庫存失敗:', err.toString());
+                console.log(err);
+                response = apiResponse(20099, [], TEXT.CheckOutFail);
+            } else {
+                writeLogToFile('/bakery/order/create - 更新麵包坊商品庫存成功');
                 response = apiResponse(20000, [], TEXT.CheckOutSuccess);
             }
             res.send(response);
         });
-    }).then(() => {
-        // 需要去更新 bakery_store 表
     })
 
 });

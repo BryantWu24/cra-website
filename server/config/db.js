@@ -5,5 +5,6 @@ var connection = mysql.createConnection({
     user: "root",
     password: "",
     database: "cra-website",
+    multipleStatements: true // 一次執行多行
 });
 module.exports = connection;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-11-17 03:14:54
+-- 產生時間： 2021-11-17 10:52:37
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -61,6 +61,17 @@ CREATE TABLE `bakery_ingredients` (
   `FBakeryMaterialName` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- 傾印資料表的資料 `bakery_ingredients`
+--
+
+INSERT INTO `bakery_ingredients` (`FBakeryIngredientId`, `FBakeryMaterialId`, `FBakeryMaterialName`) VALUES
+('62bc1d30-9c66-4130-9a7e-ba299fa9b0c3', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
+('62bc1d30-9c66-4130-9a7e-ba299fa9b0c3', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
+('62bc1d30-9c66-4130-9a7e-ba299fa9b0c3', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('b7305ba0-be21-4ffe-b803-86705aee09ef', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
+('b7305ba0-be21-4ffe-b803-86705aee09ef', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶');
+
 -- --------------------------------------------------------
 
 --
@@ -74,7 +85,8 @@ CREATE TABLE `bakery_item` (
   `FStorageCount` int(100) NOT NULL,
   `FStorageDays` int(100) NOT NULL,
   `FStorageMethod` varchar(300) NOT NULL,
-  `FBakeryIngredientId` varchar(36) NOT NULL
+  `FBakeryIngredientId` varchar(36) NOT NULL,
+  `FUpdateTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -122,7 +134,7 @@ CREATE TABLE `bakery_order_detail` (
   `FOrderDetailId` varchar(36) NOT NULL,
   `FOrderId` varchar(36) NOT NULL,
   `FBakeryItemId` varchar(36) NOT NULL,
-  `FName` varchar(20) NOT NULL,
+  `FBakeryItemName` varchar(20) NOT NULL,
   `FCount` int(10) NOT NULL,
   `FUnitPrice` int(10) NOT NULL,
   `FTotalPrice` int(10) NOT NULL,

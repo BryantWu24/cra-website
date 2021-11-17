@@ -274,7 +274,7 @@ export default class Bakery extends Component {
             orderTotalPrice: this.state.orderTotalPrice,
             FUserId: profile.id
         }
-        await axios.post(Config.apiUrl + '/bakery/order/create', body).then((res) => {
+        await axios.post(Config.apiUrl + '/openapi/bakery/order/create', body).then((res) => {
             console.log(res)
             if (!!res.data) {
                 switch (res.data.code.toString()) {
