@@ -10,6 +10,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
 import { Config } from '../../core/config'
+import Pageheader from '../../components/PageHeader';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -83,7 +84,7 @@ class BakeryManage extends Component {
                                 this.setState({
                                     data: tableData
                                 })
-                            },100)
+                            }, 100)
                             break;
                         default:
                             break;
@@ -214,7 +215,7 @@ class BakeryManage extends Component {
                 width: 50,
             },
         ];
-
+        const title = '烘焙坊後臺管理系統 - ' + this.state.title
         return (
             <Grid container>
                 <Snackbar
@@ -232,7 +233,7 @@ class BakeryManage extends Component {
                     </Alert>
                 </Snackbar>
                 <Grid item xs={12}>
-                    Bakery 後臺管理系統 - {this.state.title}
+                    <Pageheader title={title} ></Pageheader>
                 </Grid>
                 <Grid item xs={12} style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '50px' }}>

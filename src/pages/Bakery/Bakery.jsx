@@ -33,6 +33,7 @@ import axios from 'axios';
 import { Config } from '../../core/config';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Pageheader from '../../components/PageHeader';
 
 const actions = [
     { icon: <ShoppingCartIcon />, name: '購物清單' },
@@ -119,7 +120,7 @@ export default class Bakery extends Component {
         const apiBody = {
             FBakeryItemId: info.FBakeryItemId
         }
-        axios.post(Config.apiUrl + '/bakery/item/item',apiBody).then((res) => {
+        axios.post(Config.apiUrl + '/bakery/item/item', apiBody).then((res) => {
             if (!!res.data) {
                 if (res.data.code === 20000) {
                     info.FStorageCount = res.data.data[0].FStorageCount;
@@ -318,6 +319,12 @@ export default class Bakery extends Component {
                         {this.state.snackbarMsg}
                     </Alert>
                 </Snackbar>
+                <Grid container >
+                    <Grid xs={12}>
+                        <Pageheader title='烘焙坊商品清單'></Pageheader>
+                    </Grid>
+                </Grid>
+
                 <Grid container spacing={2}>
                     {
                         this.state.data.map((item, idx) => {

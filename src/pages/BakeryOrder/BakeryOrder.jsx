@@ -4,6 +4,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
 import { Config } from '../../core/config'
+import Pageheader from '../../components/PageHeader';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -66,7 +67,7 @@ class BakeryOrder extends Component {
                     </Alert>
                 </Snackbar>
                 <Grid item xs={12}>
-                    Bakery 訂單管理系統
+                    <Pageheader title='烘焙坊訂單管理系統'></Pageheader>
                 </Grid>
             </Grid >
         );

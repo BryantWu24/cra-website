@@ -9,6 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { Config } from '../../core/config'
+import PageHeader from '../../components/PageHeader';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -193,6 +194,11 @@ class Database extends Component {
                         {this.state.snackbarMsg}
                     </Alert>
                 </Snackbar>
+
+                <Grid container justifyItems='center'>
+                    <PageHeader title='資料庫管理平台'></PageHeader>
+                </Grid>
+
                 {
                     (this.state.tableNameData.length === 0)
                         ?

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-11-15 11:02:43
+-- 產生時間： 2021-11-17 03:14:54
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -146,12 +146,12 @@ CREATE TABLE `list` (
 --
 
 INSERT INTO `list` (`FListId`, `FListName`, `FListKey`) VALUES
-('026eebc2-e025-4390-958c-78e86f0516a0', '麵包坊', 'Bakery'),
+('026eebc2-e025-4390-958c-78e86f0516a0', '烘焙坊', 'Bakery'),
 ('63d3834a-9814-45e2-8995-a11512bbc608', '儀錶板', 'Dashboard'),
-('fb3ae05d-030b-4ba0-8dc6-9e0f65808bc6', '麵包坊管理平台', 'Bakery Manage'),
+('fb3ae05d-030b-4ba0-8dc6-9e0f65808bc6', '烘焙坊後台系統', 'Bakery Manage'),
 ('ac03a4ab-8432-402a-8bde-449a2e276303', '工具區', 'Tools'),
 ('c2f3dafe-46bf-4a72-9f7c-d3eac8120e41', '資料庫管理', 'Database'),
-('bd6495a3-9bc5-4cbf-b936-b08e1c0a3263', '麵包坊訂單系統', 'Bakery Order');
+('bd6495a3-9bc5-4cbf-b936-b08e1c0a3263', '烘焙坊訂單系統', 'Bakery Order');
 
 -- --------------------------------------------------------
 
