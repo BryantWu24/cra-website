@@ -60,7 +60,7 @@ export default class Bakery extends Component {
                 FStorageCount: 0,
                 FtorageDays: 0,
                 FtorageMethod: "",
-                FName: "",
+                FBakeryItemName: "",
             },
             orderList: [],
             orderTotalPrice: 0,
@@ -124,7 +124,15 @@ export default class Bakery extends Component {
             if (!!res.data) {
                 if (res.data.code === 20000) {
                     info.FStorageCount = res.data.data[0].FStorageCount;
+                    // 載入購物車內同品項數量
+                    let currentCount = 0
+                    this.state.orderList.forEach((item) => {
+                        if (item.FBakeryItemId === info.FBakeryItemId)
+                            currentCount = item.FCount;
+                    })
+
                     this.setState({
+                        count: currentCount,
                         currentProductInfo: info,
                         isCartDialogOpen: true
                     })
@@ -150,18 +158,35 @@ export default class Bakery extends Component {
     // 加入購物車
     addCart = () => {
         if (this.state.count !== 0) {
-            const curOrderList = this.state.orderList;
-            const orderInfo = {}
-            const profile = JSON.parse(localStorage.getItem('profile'));
-            orderInfo.FUserId = profile.id;
-            orderInfo.orderer = profile.name;
-            orderInfo.FName = this.state.currentProductInfo.FName;
-            orderInfo.FBakeryItemId = this.state.currentProductInfo.FBakeryItemId;
-            orderInfo.FCount = this.state.count;
-            orderInfo.FStorageCount = this.state.currentProductInfo.FStorageCount
-            orderInfo.FUnitPrice = this.state.currentProductInfo.FUnitPrice
-            orderInfo.FTotalPrice = this.state.currentProductInfo.FUnitPrice * this.state.count;
-            curOrderList.push(orderInfo);
+
+            let isExist = false;
+            let curOrderList = this.state.orderList;
+            if (this.state.orderList.length !== 0) {
+                // 已存在品項覆蓋數量
+                curOrderList = this.state.orderList.map((item) => {
+                    if (item.FBakeryItemId === this.state.currentProductInfo.FBakeryItemId) {
+                        item.FCount = this.state.count;
+                        item.FTotalPrice = item.FCount * item.FUnitPrice
+                        isExist = true;
+                    }
+                    return item;
+                })
+            }
+
+            if (!isExist) {
+                const orderInfo = {}
+                const profile = JSON.parse(localStorage.getItem('profile'));
+                orderInfo.FUserId = profile.id;
+                orderInfo.orderer = profile.name;
+                orderInfo.FBakeryItemName = this.state.currentProductInfo.FBakeryItemName;
+                orderInfo.FBakeryItemId = this.state.currentProductInfo.FBakeryItemId;
+                orderInfo.FCount = this.state.count;
+                orderInfo.FStorageCount = this.state.currentProductInfo.FStorageCount
+                orderInfo.FUnitPrice = this.state.currentProductInfo.FUnitPrice
+                orderInfo.FTotalPrice = this.state.currentProductInfo.FUnitPrice * this.state.count;
+                curOrderList.push(orderInfo);
+            }
+
             this.setState({
                 isCartDialogOpen: false,
                 count: 0,
@@ -320,7 +345,7 @@ export default class Bakery extends Component {
                     </Alert>
                 </Snackbar>
                 <Grid container >
-                    <Grid xs={12}>
+                    <Grid item xs={12}>
                         <Pageheader title='烘焙坊商品清單'></Pageheader>
                     </Grid>
                 </Grid>
@@ -334,7 +359,7 @@ export default class Bakery extends Component {
                 </Grid>
                 {/* 購物 Dialog */}
                 <Dialog open={this.state.isCartDialogOpen} disableEscapeKeyDown id="cart-dialog" >
-                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.FName}</DialogTitle>
+                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.FBakeryItemName}</DialogTitle>
                     <DialogContent style={{ background: '#959595', color: 'white' }} >
                         {
                             (this.state.currentProductInfo.FStorageCount === 0)
@@ -383,11 +408,11 @@ export default class Bakery extends Component {
                                             <TableBody>
                                                 {this.state.orderList.map((row, index) => (
                                                     <TableRow
-                                                        key={row.FName}
+                                                        key={row.FBakeryItemName}
                                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                     >
                                                         <TableCell component="th" scope="row">
-                                                            {row.FName}
+                                                            {row.FBakeryItemName}
                                                         </TableCell>
                                                         <TableCell align="center">{row.FUnitPrice}</TableCell>
                                                         <TableCell align="center">{row.FCount}</TableCell>
