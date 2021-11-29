@@ -236,6 +236,24 @@ app.post("/openapi/bakery/item/list", function async (req, res) {
 
         }
     })
+})
+
+// 取得麵包坊列表 (OK)
+app.post("/openapi/bakery/order/list", function async (req, res) {
+    db.query(`SELECT o.FOrderNumber,o.FUserId,o.FTotalPrice,o.FCreateDate,u.FUserName FROM bakery_order o 
+              LEFT JOIN user u on o.FUserId = u.FUserId`, function (err, result) {
+        if (err) {
+            writeLogToFile('/openapi/bakery/order/list API Error : ' + err, true);
+            const finalResponse = apiResponse(20000, err, TEXT.SearchFail);
+            res.send(finalResponse);
+        } else {
+            console.log(result);
+            writeLogToFile('/openapi/bakery/order/list API : ' + TEXT.SearchSucces);
+            // const finalResponse = apiResponse(20000, apiResult, TEXT.SearchSucces);
+            // res.send(finalResponse);
+
+        }
+    })
 
 })
 
@@ -565,24 +583,42 @@ app.post("/openapi/bakery/order/create", function async (req, res) {
     const body = req.body;
     const FOrderId = _uuid();
     const promise = new Promise((resolve, reject) => {
-        const apiBody = {
-            FUserId: body.FUserId,
-            FTotalPrice: body.orderTotalPrice,
-            FOrderId
-        }
-        // 新增麵包坊銷售紀錄
-        db.query('INSERT INTO bakery_order SET ?', apiBody, function (err, result) {
+        const orderNumberLike = 'BK-' + new Date().toLocaleDateString().replace(/-/g, '')
+        db.query(`SELECT FOrderNumber FROM bakery_order WHERE FOrderNumber LIKE '` + orderNumberLike + `%' order by FOrderNumber desc `, function (err, rows, fields) {
             if (err) {
-                writeLogToFile('/bakery/order/create - 新增麵包坊銷售紀錄失敗: ' + err, true);
-                reject(err);
+                writeLogToFile('Search Order Table Error Log :' + err, true)
+                throw err;
             } else {
-                writeLogToFile('/bakery/order/create - 新增麵包坊銷售紀錄成功，FOrderId :', FOrderId);
-                resolve(FOrderId)
+                writeLogToFile('Search Order Table : ' + TEXT.SearchSuccess)
+                console.log('Search Order Table :', rows[0].FOrderNumber);
+                let currentNumber = (parseInt(rows[0].FOrderNumber.split('-')[rows[0].FOrderNumber.split('-').length - 1]) + 1);
+                if (currentNumber.toString().length === 1) currentNumber = currentNumber.toString().padStart(3, '0')
+                if (currentNumber.toString().length === 2) currentNumber = currentNumber.toString().padStart(2, '0')
+                const FOrderNumber = orderNumberLike + '-' + currentNumber;
+                resolve(FOrderNumber);
+
             }
         });
     });
 
-    promise.then((FOrderId) => {
+    promise.then((FOrderNumber) => {
+        const apiBody = {
+            FUserId: body.FUserId,
+            FTotalPrice: body.orderTotalPrice,
+            FOrderId,
+            FOrderNumber: FOrderNumber
+        };
+        // 新增麵包坊銷售紀錄
+        db.query('INSERT INTO bakery_order SET ?', apiBody, function (err, result) {
+            if (err) {
+                writeLogToFile('/bakery/order/create - 新增麵包坊銷售紀錄失敗: ' + err, true);
+                promise.catch(err);
+            } else {
+                writeLogToFile('/bakery/order/create - 新增麵包坊銷售紀錄成功，FOrderId :', FOrderId);
+            }
+        });
+    }).then(() => {
+        console.log(FOrderId);
         // 新增麵包坊銷售明細
         const sql = `INSERT INTO bakery_order_detail (FOrderDetailId,FOrderId,FBakeryItemId,FBakeryItemName,FCount,FUnitPrice,FTotalPrice) VALUES ?`;
         const apiBody = [];
@@ -621,8 +657,8 @@ app.post("/openapi/bakery/order/create", function async (req, res) {
             res.send(response);
         });
     })
-
 });
+
 
 // 產生 UUID
 function _uuid() {

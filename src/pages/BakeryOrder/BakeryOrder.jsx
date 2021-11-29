@@ -19,6 +19,7 @@ class BakeryOrder extends Component {
     }
 
     componentDidMount = () => {
+        this.getOrderList();
     }
 
 
@@ -47,6 +48,12 @@ class BakeryOrder extends Component {
             default:
                 break;
         }
+    }
+
+    getOrderList = async () => {
+        await axios.post(Config.apiUrl + '/openapi/bakery/order/list').then((res) => {
+            console.log('getOrderList:', res);
+        })
     }
 
     render() {
