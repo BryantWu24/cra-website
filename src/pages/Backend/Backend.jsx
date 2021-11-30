@@ -778,7 +778,6 @@ class Backend extends Component {
                             type="text"
                             fullWidth
                             variant="outlined"
-
                             onChange={this.handleLoginAccount}
                             value={this.state.loginInfo.account}
                             helperText={this.state.loginInfo.err_account}

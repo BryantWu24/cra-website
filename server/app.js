@@ -55,6 +55,8 @@ const apiResponse = (code, data, message) => {
 
 const TEXT = {
     "CreateSuccess": "建立成功",
+    "UpdateSuccess": "更新成功",
+    "UpdateFail": "更新失敗",
     "CreateFail": "建立失敗",
     "RegisterSuccess": "註冊成功",
     "RegisterFail": "註冊失敗",
@@ -192,6 +194,11 @@ app.post("/list/list", function async (req, res) {
     querySelectList('list', res);
 });
 
+// 取得訂單狀態
+app.post("/bakery/order/status/list", function async (req, res) {
+    querySelectList('bakery_order_status', res);
+});
+
 // 取得指定商品  (OK)
 app.post("/bakery/item/item", function async (req, res) {
     const FBakeryItemId = req.body.FBakeryItemId;
@@ -240,17 +247,18 @@ app.post("/openapi/bakery/item/list", function async (req, res) {
 
 // 取得麵包坊列表 (OK)
 app.post("/openapi/bakery/order/list", function async (req, res) {
-    db.query(`SELECT o.FOrderNumber,o.FUserId,o.FTotalPrice,o.FCreateDate,u.FUserName FROM bakery_order o 
-              LEFT JOIN user u on o.FUserId = u.FUserId`, function (err, result) {
+    db.query(`SELECT o.FOrderNumber,s.FOrderStatusName,s.FOrderStatusId,s.FOrder,o.FUserId,o.FTotalPrice,o.FCreateDate,u.FUserName FROM bakery_order o 
+              LEFT JOIN user u on o.FUserId = u.FUserId 
+              LEFT JOIN bakery_order_status s on s.FOrderStatusId = o.FOrderStatusId`, function (err, result) {
         if (err) {
             writeLogToFile('/openapi/bakery/order/list API Error : ' + err, true);
-            const finalResponse = apiResponse(20000, err, TEXT.SearchFail);
+            const finalResponse = apiResponse(20099, err, TEXT.SearchFail);
             res.send(finalResponse);
         } else {
             console.log(result);
             writeLogToFile('/openapi/bakery/order/list API : ' + TEXT.SearchSucces);
-            // const finalResponse = apiResponse(20000, apiResult, TEXT.SearchSucces);
-            // res.send(finalResponse);
+            const finalResponse = apiResponse(20000, result, TEXT.SearchSucces);
+            res.send(finalResponse);
 
         }
     })
@@ -323,7 +331,24 @@ app.post("/bakery/item/delete", function async (req, res) {
     })
 })
 
-// 更新產品 
+// 更新訂單 
+app.post("/bakery/order/update", function async (req, res) {
+    const conditions = req.body.conditions;
+    const body = JSON.parse(JSON.stringify(req.body));
+    delete body.conditions;
+
+    db.query('update bakery_order set ? where ' + conditions[0].field + ' = ?', [body, conditions[0].value], function (err, fields) {
+        if (err) {
+            writeLogToFile('/bakery/order/status/update - 更新訂單狀態失敗 : ' + err, true);
+        } else {
+            writeLogToFile('/bakery/order/status/update - 更新訂單狀態成功');
+            const finalResponse = apiResponse(20000, [], TEXT.UpdateSuccess);
+            res.send(finalResponse).end();
+        }
+    });
+})
+
+// 更新產品
 app.post("/bakery/item/update", function async (req, res) {
     const body = req.body;
     let allMaterial = [];
@@ -590,8 +615,7 @@ app.post("/openapi/bakery/order/create", function async (req, res) {
                 throw err;
             } else {
                 writeLogToFile('Search Order Table : ' + TEXT.SearchSuccess)
-                console.log('Search Order Table :', rows[0].FOrderNumber);
-                let currentNumber = (parseInt(rows[0].FOrderNumber.split('-')[rows[0].FOrderNumber.split('-').length - 1]) + 1);
+                let currentNumber = (rows.length === 0) ? 1 : (parseInt(rows[0].FOrderNumber.split('-')[rows[0].FOrderNumber.split('-').length - 1]) + 1);
                 if (currentNumber.toString().length === 1) currentNumber = currentNumber.toString().padStart(3, '0')
                 if (currentNumber.toString().length === 2) currentNumber = currentNumber.toString().padStart(2, '0')
                 const FOrderNumber = orderNumberLike + '-' + currentNumber;
@@ -606,7 +630,8 @@ app.post("/openapi/bakery/order/create", function async (req, res) {
             FUserId: body.FUserId,
             FTotalPrice: body.orderTotalPrice,
             FOrderId,
-            FOrderNumber: FOrderNumber
+            FOrderNumber: FOrderNumber,
+            FOrderStatusId: '7df08db2-91f1-41ec-8f86-60bcb7a3564e' //等待確定訂單
         };
         // 新增麵包坊銷售紀錄
         db.query('INSERT INTO bakery_order SET ?', apiBody, function (err, result) {
