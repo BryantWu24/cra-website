@@ -32,6 +32,7 @@ app.listen(port, () => {
     fs.unlink('log.txt', function () {
         console.log('已經刪除 log.txt 檔案!');
     });
+
 });
 
 const apiResponse = (code, data, message) => {
@@ -245,9 +246,9 @@ app.post("/openapi/bakery/item/list", function async (req, res) {
     })
 })
 
-// 取得麵包坊列表 (OK)
+// 取得訂單列表 (OK)
 app.post("/openapi/bakery/order/list", function async (req, res) {
-    db.query(`SELECT o.FOrderNumber,s.FOrderStatusName,s.FOrderStatusId,s.FOrder,o.FUserId,o.FTotalPrice,o.FCreateDate,u.FUserName FROM bakery_order o 
+    db.query(`SELECT o.FOrderNumber,s.FOrderStatusName,o.FOrderId,s.FOrderStatusId,s.FOrder,o.FUserId,o.FTotalPrice,o.FCreateDate,u.FUserName FROM bakery_order o 
               LEFT JOIN user u on o.FUserId = u.FUserId 
               LEFT JOIN bakery_order_status s on s.FOrderStatusId = o.FOrderStatusId`, function (err, result) {
         if (err) {
@@ -262,7 +263,29 @@ app.post("/openapi/bakery/order/list", function async (req, res) {
 
         }
     })
+})
 
+
+
+// 取得整筆訂單明細列表 (OK)
+app.post("/openapi/bakery/getSpecifyOrderDetail", function async (req, res) {
+    const FOrderId = req.body.id;
+    console.log('FOrderId:', FOrderId)
+    db.query(`SELECT o.FOrderId,o.FOrderNumber,o.FTotalPrice as 'FOrderTotalPrice' , od.FBakeryItemName,od.FCount,od.FUnitPrice,od.FTotalPrice as 'FOrderDetailTotalPrice' FROM  bakery_order o 
+              LEFT JOIN bakery_order_detail  od ON o.FOrderId = od.FOrderId WHERE od.FOrderId = '${FOrderId}'`,
+        function (err, result) {
+            if (err) {
+                writeLogToFile('/openapi/bakery/order/list API Error : ' + err, true);
+                console.log(err);
+                const finalResponse = apiResponse(20099, err, TEXT.SearchFail);
+                res.send(finalResponse);
+            } else {
+                console.log(result);
+                writeLogToFile('/openapi/bakery/order/list API : ' + TEXT.SearchSucces);
+                const finalResponse = apiResponse(20000, result, TEXT.SearchSucces);
+                res.send(finalResponse);
+            }
+        })
 })
 
 // 建立使用者 (OK)
@@ -608,7 +631,11 @@ app.post("/openapi/bakery/order/create", function async (req, res) {
     const body = req.body;
     const FOrderId = _uuid();
     const promise = new Promise((resolve, reject) => {
-        const orderNumberLike = 'BK-' + new Date().toLocaleDateString().replace(/-/g, '')
+        const curDateAry = new Date().toLocaleDateString().split('-');
+        if (curDateAry[1].length === 1) curDateAry[1] = '0' + curDateAry[1].toString();
+        if (curDateAry[2].length === 1) curDateAry[2] = '0' + curDateAry[2].toString();
+        const orderNumberLike = 'BK-' + curDateAry[0] + curDateAry[1] + curDateAry[2];
+
         db.query(`SELECT FOrderNumber FROM bakery_order WHERE FOrderNumber LIKE '` + orderNumberLike + `%' order by FOrderNumber desc `, function (err, rows, fields) {
             if (err) {
                 writeLogToFile('Search Order Table Error Log :' + err, true)

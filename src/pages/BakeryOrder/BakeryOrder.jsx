@@ -22,11 +22,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const styles = (theme) => ({
     root: {
         display: 'flex',
-    }, MuiDataGridColCellTitle: {
-        display: 'block',
-        textAlign: 'center',
-        width: '100%'
-    }
+    },
 });
 
 class BakeryOrder extends Component {
@@ -38,7 +34,8 @@ class BakeryOrder extends Component {
             isStatusDialogOpen: false,
             orderStatus: [],
             currentStatus: {},
-            nextStatus: {}
+            nextStatus: {},
+            selectedData: []
         }
     }
 
@@ -119,6 +116,7 @@ class BakeryOrder extends Component {
                     FOrderStatusId: item.FOrderStatusId,
                     FOrderStatusName: item.FOrderStatusName,
                     FOrder: item.FOrder,
+                    FOrderId: item.FOrderId,
                     FTotalPrice: item.FTotalPrice,
                     FCreateDate: new Date(item.FCreateDate).toLocaleString(),
                     id: index + 1
@@ -142,10 +140,29 @@ class BakeryOrder extends Component {
         })
     }
 
+    getOrderDetail = async (id) => {
+        const body = { id }
+        await axios.post(Config.apiUrl + '/openapi/bakery/getSpecifyOrderDetail', body).then((res) => {
+            console.log('OrderDetail:', res);
+            if (!!res.data) {
+                switch (res.data.code.toString()) {
+                    case '20000':
+                        const data = res.data.data;
+                        this.setState({
+                            selectedData: data
+                        })
+                        break;
+                    default:
+                        break;
+                }
+            } else this.showSnackbar('error', '取得商品清單發生異常，請稍後再嘗試。');
+        })
+    }
+
     // handle 點擊列
     handleRowClick = (item) => {
         console.log(item);
-
+        this.getOrderDetail(item.row.FOrderId);
         const FOrder = item.row.FOrder;
         let nextStatus = {};
         const currentStatus = {
@@ -218,13 +235,61 @@ class BakeryOrder extends Component {
                 </Grid>
                 {/* 狀態 Dialog */}
                 <Dialog open={this.state.isStatusDialogOpen} disableEscapeKeyDown id="status-dialog" >
-                    <DialogTitle style={{ background: '#EBEBEB', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >更新狀態</DialogTitle>
-                    <DialogContent style={{ background: '#EBEBEB', color: 'white' }} >
-                        目前訂單狀態為 {this.state?.currentStatus?.FOrderStatusName} ，是否要將狀態更新至 {this.state?.nextStatus?.FOrderStatusName}
+                    <DialogTitle style={{ display: 'flex', justifyContent: 'center', alignItems: 'start', fontSize: '1.5rem', fontWeight: 'bold' }} >
+                        訂單明細
+                    </DialogTitle>
+                    <DialogContent  >
+                        <div style={{ width: '100%', maxHeight: '20rem', display: 'flex', justifyContent: 'center', alignItems: 'start', paddingBottom: '1rem' }}>
+                            {
+                                this.state.selectedData.length > 0
+                                    ?
+                                    <table style={{ border: '1px solid black' }}>
+                                        <thead>
+                                            <tr>
+                                                <th style={{ border: 'solid 1px black' }}>商品名稱</th>
+                                                <th style={{ border: 'solid 1px black' }}>單價</th>
+                                                <th style={{ border: 'solid 1px black' }}>數量</th>
+                                                <th style={{ border: 'solid 1px black' }}>單項合計</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                this.state.selectedData.map((item) => {
+                                                    return (
+                                                        <tr>
+                                                            <td style={{ border: 'solid 1px black' }}>{item.FBakeryItemName}</td>
+                                                            <td style={{ border: 'solid 1px black' }}>{item.FUnitPrice}</td>
+                                                            <td style={{ border: 'solid 1px black' }}>{item.FCount}</td>
+                                                            <td style={{ border: 'solid 1px black' }}>{item.FOrderDetailTotalPrice}</td>
+                                                        </tr>)
+                                                })
+                                            }
+                                            <tr>
+                                                <td colSpan='4' style={{ border: 'solid 1px black', textAlign: 'end' }}>  總計： {this.state.selectedData[0].FOrderTotalPrice}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    :
+                                    <div> 查無此明細 </div>
+                            }
+                        </div>
+                        {
+                            this.state?.currentStatus?.FOrderStatusName === '已完成'
+                                ?
+                                <div></div>
+                                :
+                                <div >目前訂單狀態為<span style={{ color: 'red', fontSize: '1rem', fontWeight: 'bold' }}>{this.state?.currentStatus?.FOrderStatusName}</span>，是否要將狀態更新至<span style={{ color: 'red', fontSize: '1rem', fontWeight: 'bold' }}>{this.state?.nextStatus?.FOrderStatusName}</span></div>
+                        }
                     </DialogContent>
-                    <DialogActions style={{ background: '#EBEBEB' }} >
-                        <Button color="secondary" onClick={this.switchStatusDialog} >取消</Button>
-                        <Button color="secondary" onClick={this.updateStatus}>確定</Button>
+                    <DialogActions>
+                        <Button color="secondary" onClick={this.switchStatusDialog} >關閉</Button>
+                        {
+                            this.state?.currentStatus?.FOrderStatusName === '已完成'
+                                ?
+                                <div></div>
+                                :
+                                <Button color="secondary" onClick={this.updateStatus}>更新狀態</Button>
+                        }
                     </DialogActions>
                 </Dialog >
             </Grid >
