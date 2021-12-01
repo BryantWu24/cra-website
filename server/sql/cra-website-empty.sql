@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-12-01 07:19:00
+-- 產生時間： 2021-12-01 09:15:20
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -70,6 +70,7 @@ CREATE TABLE `bakery_ingredients` (
 CREATE TABLE `bakery_item` (
   `FBakeryItemId` varchar(36) NOT NULL,
   `FBakeryItemName` varchar(30) NOT NULL,
+  `FBakeryItemUrl` varchar(350) NOT NULL,
   `FUnitPrice` int(100) NOT NULL,
   `FStorageCount` int(100) NOT NULL,
   `FStorageDays` int(100) NOT NULL,

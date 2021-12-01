@@ -76,6 +76,7 @@ class BakeryManage extends Component {
                                     FStorageMethod: item.FStorageMethod,
                                     FBakeryIngredientId: item.FBakeryIngredientId,
                                     FBakeryItemId: item.FBakeryItemId,
+                                    FBakeryItemUrl: item.FBakeryItemUrl,
                                     id: index
                                 })
                             })

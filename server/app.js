@@ -21,9 +21,11 @@ const corsOptions = {
     credentials: true,
     optionSuccessStatus: 200
 }
+const formidable = require("formidable");
 
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use('/public', express.static('public'))
 app.listen(port, () => {
     console.log(`RUN http://localhost:${port}`);
     fs.unlink('error-log.txt', function () {
@@ -58,6 +60,8 @@ const TEXT = {
     "CreateSuccess": "建立成功",
     "UpdateSuccess": "更新成功",
     "UpdateFail": "更新失敗",
+    "UploadFail": "上傳失敗",
+    "UploadSuccess": "上傳成功",
     "CreateFail": "建立失敗",
     "RegisterSuccess": "註冊成功",
     "RegisterFail": "註冊失敗",
@@ -75,6 +79,37 @@ const TEXT = {
     "MaterialIsExist": "此原料已被建立",
     "CheckOutSuccess": "送出訂單成功"
 }
+
+// 上傳
+app.post('/api/upload', (req, res) => {
+    var form = new formidable.IncomingForm()
+    var path = require('path')
+    form.uploadDir = path.join(__dirname, '../public/bakeryImg/');
+    form.keepExtensions = true;
+    form.parse(req, function (err, fields, files) {
+        if (err) {
+            const response = apiResponse(20099, [], TEXT.UploadFail);
+            res.send(response);
+            throw err;
+        }
+        let oldFilename = files.imgFile.originalFilename;
+        //重新命名上傳的檔案
+        fs.rename(files.imgFile.filepath, form.uploadDir + oldFilename, err => {
+            if (err) {
+                console.log("重新命名失敗");
+                const response = apiResponse(20099, [], TEXT.UploadFail);
+                res.send(response);
+                console.log(err);
+            } else {
+                console.log("重新命名成功!");
+            }
+        })
+        const response = apiResponse(20000, [{
+            url: '/bakeryImg/' + oldFilename
+        }], TEXT.UploadSuccess);
+        res.send(response);
+    })
+})
 
 // 登入 (OK)
 app.post("/login", function async (req, res) {

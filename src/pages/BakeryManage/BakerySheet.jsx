@@ -44,6 +44,7 @@ class BakerySheet extends Component {
                 ingredients: [],
                 FStorageDays: 0,
                 FStorageMethod: '',
+                FBakeryItemUrl: '',
             },
             errorData: {
                 FBakeryItemName: '',
@@ -63,7 +64,9 @@ class BakerySheet extends Component {
             materialData: [],
             isSnackbarOpen: false,
             snackbarMsg: '',
-            isShowAddMaterialDialog: false
+            isShowAddMaterialDialog: false,
+            uploadFile: null,
+            uploadUrl: '',
         }
         this.doSave = this.doSave.bind(this);
         this.handleMateriaChange = this.handleMateriaChange.bind(this);
@@ -161,69 +164,73 @@ class BakerySheet extends Component {
         const errorData = this.state.errorData;
         if (Object.values(errorData).some(item => item.length !== 0)) this.showSnackbar('error', '請確認資料是否填寫正確')
         else {
-            const itemData = this.state.data;
-            const request = {};
-            request.FBakeryItemName = itemData.FBakeryItemName;
-            request.FUnitPrice = itemData.FUnitPrice;
-            request.FStorageCount = itemData.FStorageCount;
-            request.FStorageDays = itemData.FStorageDays;
-            request.FStorageMethod = itemData.FStorageMethod;
-            request.ingredients = itemData.ingredients;
-            request.FBakeryItemId = itemData.FBakeryItemId;
-            request.FBakeryIngredientId = itemData.FBakeryIngredientId;
+            this.upload().then(async () => {
+                const itemData = this.state.data;
+                const request = {};
+                request.FBakeryItemName = itemData.FBakeryItemName;
+                request.FUnitPrice = itemData.FUnitPrice;
+                request.FStorageCount = itemData.FStorageCount;
+                request.FStorageDays = itemData.FStorageDays;
+                request.FStorageMethod = itemData.FStorageMethod;
+                request.ingredients = itemData.ingredients;
+                request.FBakeryItemId = itemData.FBakeryItemId;
+                request.FBakeryIngredientId = itemData.FBakeryIngredientId;
+                request.FBakeryItemUrl = itemData.FBakeryItemUrl || '';
 
-            if (!!request.FBakeryItemId && request.FBakeryItemId.length > 0) {
-                await axios
-                    .post(Config.apiUrl + "/bakery/item/update", request)
-                    .then((res) => {
-                        if (!!res.data) {
-                            console.log('bakery item update :', res.data);
-                            switch (res.data.code.toString()) {
-                                case '20000':
-                                    this.showSnackbar('success', res.data.message);
-                                    break;
-                                case '20099':
-                                    this.showSnackbar('error', res.data.message);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        } else this.showSnackbar('error', '更新產品發生異常，請稍後再嘗試。');
-                    })
-                    .catch((e) => { this.showSnackbar('error', '更新產品發生異常，請稍後再嘗試。'); });
-            } else {
-                await axios
-                    .post(Config.apiUrl + "/bakery/item/create", request)
-                    .then((res) => {
-                        if (!!res.data) {
-                            console.log('bakery item create :', res.data);
-                            switch (res.data.code.toString()) {
-                                case '20000':
-                                    const data = {
-                                        FBakeryIngredientId: res.data.data[0].FBakeryIngredientId,
-                                        FBakeryItemId: res.data.data[0].FBakeryItemId,
-                                        ingredients: res.data.data[0].ingredients,
-                                        FBakeryItemName: res.data.data[0].FBakeryItemName,
-                                        FStorageCount: res.data.data[0].FStorageCount,
-                                        FStorageDays: res.data.data[0].FStorageDays,
-                                        FStorageMethod: res.data.data[0].FStorageMethod,
-                                        FUnitPrice: res.data.data[0].FUnitPrice
-                                    }
-                                    this.setState({
-                                        data
-                                    })
-                                    this.showSnackbar('success', res.data.message);
-                                    break;
-                                case '20099':
-                                    this.showSnackbar('error', res.data.message);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        } else this.showSnackbar('error', '新增產品發生異常，請稍後再嘗試。');
-                    })
-                    .catch((e) => { this.showSnackbar('error', '新增產品發生異常，請稍後再嘗試。'); });
-            }
+                if (!!request.FBakeryItemId && request.FBakeryItemId.length > 0) {
+                    await axios
+                        .post(Config.apiUrl + "/bakery/item/update", request)
+                        .then((res) => {
+                            if (!!res.data) {
+                                console.log('bakery item update :', res.data);
+                                switch (res.data.code.toString()) {
+                                    case '20000':
+                                        this.showSnackbar('success', res.data.message);
+                                        break;
+                                    case '20099':
+                                        this.showSnackbar('error', res.data.message);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else this.showSnackbar('error', '更新產品發生異常，請稍後再嘗試。');
+                        })
+                        .catch((e) => { this.showSnackbar('error', '更新產品發生異常，請稍後再嘗試。'); });
+                } else {
+                    await axios
+                        .post(Config.apiUrl + "/bakery/item/create", request)
+                        .then((res) => {
+                            if (!!res.data) {
+                                console.log('bakery item create :', res.data);
+                                switch (res.data.code.toString()) {
+                                    case '20000':
+                                        const data = {
+                                            FBakeryIngredientId: res.data.data[0].FBakeryIngredientId,
+                                            FBakeryItemId: res.data.data[0].FBakeryItemId,
+                                            ingredients: res.data.data[0].ingredients,
+                                            FBakeryItemName: res.data.data[0].FBakeryItemName,
+                                            FStorageCount: res.data.data[0].FStorageCount,
+                                            FStorageDays: res.data.data[0].FStorageDays,
+                                            FStorageMethod: res.data.data[0].FStorageMethod,
+                                            FUnitPrice: res.data.data[0].FUnitPrice,
+                                            FBakeryItemUrl: res.data.data[0].FBakeryItemUrl
+                                        }
+                                        this.setState({
+                                            data
+                                        })
+                                        this.showSnackbar('success', res.data.message);
+                                        break;
+                                    case '20099':
+                                        this.showSnackbar('error', res.data.message);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else this.showSnackbar('error', '新增產品發生異常，請稍後再嘗試。');
+                        })
+                        .catch((e) => { this.showSnackbar('error', '新增產品發生異常，請稍後再嘗試。'); });
+                }
+            })
         }
 
     }
@@ -333,6 +340,40 @@ class BakerySheet extends Component {
         })
     }
 
+    handleUpload = (e) => {
+        if (!!e.target.files[0]) {
+            this.setState({
+                uploadFile: e.target.files[0]
+            })
+        }
+    }
+
+    upload = async (e) => {
+        if (this.state?.uploadFile !== null) {
+            const data = new FormData()
+            data.append('imgFile', this.state.uploadFile)
+
+            return await axios.post(Config.apiUrl + "/api/upload", data)
+                .then(res => {
+                    console.log(res)
+                    if (!!res.data) {
+                        switch (res.data.code.toString()) {
+                            case '20000':
+                                const data = this.state.data;
+                                data.FBakeryItemUrl = res.data.data[0].url
+                                this.setState(data);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                })
+                .catch(err => {
+                    throw err
+                })
+        }
+    }
+
     render() {
         return (
             <Grid container spacing={2}>
@@ -360,6 +401,19 @@ class BakerySheet extends Component {
                         value={this.state.data.FBakeryItemName}
                         error={(this.state.errorData?.FBakeryItemName?.length > 0 && !!this.state.hasDoSave)} />
                     <div style={{ width: '100%', textAlign: 'left', color: 'red' }}>{this.state.errorData.FBakeryItemName}</div>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4} lg={2}>
+                    <Button
+                        variant="contained"
+                        component="label"
+                    >
+                        Upload File
+                        <input
+                            type="file"
+                            hidden
+                            onChange={this.handleUpload}
+                        />
+                    </Button>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4} lg={2}>
                     <TextField
