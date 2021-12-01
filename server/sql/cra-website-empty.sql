@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-11-17 10:52:37
+-- 產生時間： 2021-12-01 07:19:00
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -61,17 +61,6 @@ CREATE TABLE `bakery_ingredients` (
   `FBakeryMaterialName` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- 傾印資料表的資料 `bakery_ingredients`
---
-
-INSERT INTO `bakery_ingredients` (`FBakeryIngredientId`, `FBakeryMaterialId`, `FBakeryMaterialName`) VALUES
-('62bc1d30-9c66-4130-9a7e-ba299fa9b0c3', '680008c2-61f7-4720-a950-fd5754f9aa03', '高筋麵粉'),
-('62bc1d30-9c66-4130-9a7e-ba299fa9b0c3', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
-('62bc1d30-9c66-4130-9a7e-ba299fa9b0c3', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
-('b7305ba0-be21-4ffe-b803-86705aee09ef', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
-('b7305ba0-be21-4ffe-b803-86705aee09ef', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶');
-
 -- --------------------------------------------------------
 
 --
@@ -119,7 +108,9 @@ INSERT INTO `bakery_material` (`FBakeryMaterialId`, `FBakeryMaterialName`) VALUE
 
 CREATE TABLE `bakery_order` (
   `FOrderId` varchar(36) NOT NULL,
+  `FOrderNumber` varchar(20) NOT NULL,
   `FUserId` varchar(36) NOT NULL,
+  `FOrderStatusId` varchar(36) NOT NULL,
   `FTotalPrice` int(100) NOT NULL,
   `FCreateDate` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -140,6 +131,29 @@ CREATE TABLE `bakery_order_detail` (
   `FTotalPrice` int(10) NOT NULL,
   `FCreateTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bakery_order_status`
+--
+
+CREATE TABLE `bakery_order_status` (
+  `FOrderStatusId` varchar(36) NOT NULL,
+  `FOrderStatusName` varchar(10) NOT NULL,
+  `FOrder` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `bakery_order_status`
+--
+
+INSERT INTO `bakery_order_status` (`FOrderStatusId`, `FOrderStatusName`, `FOrder`) VALUES
+('aeff66f8-90df-43f4-874f-6192561ec115', '備料中', 2),
+('f8f46d96-a98b-4113-9cb0-88ff32e81dc1', '製作中', 3),
+('8c2101d9-5934-4e80-bae2-37053d04fe76', '待出貨', 4),
+('7df08db2-91f1-41ec-8f86-60bcb7a3564e', '等待確認訂單', 1),
+('778248e2-d5f3-4927-84c5-43184e6acc3c', '已完成', 5);
 
 -- --------------------------------------------------------
 
