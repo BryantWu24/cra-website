@@ -48,6 +48,8 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { Config } from '../../core/config'
 
+import './Backend.css';
+
 const styles = (theme) => ({
     root: {
         display: 'flex',
@@ -63,7 +65,8 @@ const styles = (theme) => ({
         height: '100vh',
         overflow: 'auto',
         width: '100%',
-    }, userInfoDiv: {
+    },
+    userInfoDiv: {
         padding: '10px',
         display: 'flex',
         alignItems: 'center',
@@ -809,16 +812,16 @@ class Backend extends Component {
                     </DialogActions>
                 </Dialog>
                 {/* 確認登出 Dialog */}
-                <Dialog open={this.state.isLogOutDialogOpen} disableEscapeKeyDown id="log-out-dialog">
-                    <DialogTitle style={{ background: '#EBEBEB', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >登出</DialogTitle>
-                    <DialogContent style={{ background: '#EBEBEB', color: 'white' }} >
-                        <DialogContentText style={{ background: '#EBEBEB', color: 'white' }} >
+                <Dialog open={this.state.isLogOutDialogOpen} disableEscapeKeyDown id="log-out-dialog" >
+                    <DialogTitle class="dialog-title-text">登出</DialogTitle>
+                    <DialogContent class="bgColor">
+                        <DialogContentText class="dialog-content-text" >
                             請問確定要登出了嗎?
                         </DialogContentText>
                     </DialogContent>
-                    <DialogActions style={{ background: '#EBEBEB' }} >
-                        <Button color="secondary" onClick={() => { this.closeDialog('logOut') }} >取消</Button>
-                        <Button color="secondary" onClick={this.doLogOut}>登出</Button>
+                    <DialogActions>
+                        <Button onClick={() => { this.closeDialog('logOut') }} class="dialog-action-text" >取消</Button>
+                        <Button onClick={this.doLogOut} class="dialog-action-text">登出</Button>
                     </DialogActions>
                 </Dialog>
             </div >
