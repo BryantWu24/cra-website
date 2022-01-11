@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2021-11-12 09:15:59
+-- 產生時間： 2022-01-11 07:25:09
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.3.31
 
@@ -45,7 +45,9 @@ INSERT INTO `auth` (`FAuthId`, `FRoleId`, `FListId`) VALUES
 ('a84bafbf-9a15-4deb-8dd2-b219da3659a1', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'fb3ae05d-030b-4ba0-8dc6-9e0f65808bc6'),
 ('966be30f-1bc5-40f6-8915-3f86ced797f7', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', '63d3834a-9814-45e2-8995-a11512bbc608'),
 ('11717fc0-4cde-4a1a-bfbc-0a56c04b358a', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'ac03a4ab-8432-402a-8bde-449a2e276303'),
-('7d67a76b-8674-43eb-8e77-f92da5ebe847', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'c2f3dafe-46bf-4a72-9f7c-d3eac8120e41');
+('7d67a76b-8674-43eb-8e77-f92da5ebe847', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'c2f3dafe-46bf-4a72-9f7c-d3eac8120e41'),
+('e12f11b6-f275-49ea-aba5-0122e7969a93', '9e2b52eb-b05f-4b1a-994a-7c227bb30913', 'bd6495a3-9bc5-4cbf-b936-b08e1c0a3263'),
+('ea3b8aec-143f-49f0-8267-4ee573ed8218', 'b68110de-98a5-4922-83d4-ee76da075f7d', 'bd6495a3-9bc5-4cbf-b936-b08e1c0a3263');
 
 -- --------------------------------------------------------
 
@@ -59,18 +61,6 @@ CREATE TABLE `bakery_ingredients` (
   `FBakeryMaterialName` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- 傾印資料表的資料 `bakery_ingredients`
---
-
-INSERT INTO `bakery_ingredients` (`FBakeryIngredientId`, `FBakeryMaterialId`, `FBakeryMaterialName`) VALUES
-('d9d58f47-b562-43c1-b0e5-37c4e3cd62d0', '4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
-('47913586-a805-48bb-bc85-63d6810da3eb', 'e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
-('849cc311-e984-4974-afb0-a7963074bacf', 'a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
-('05a2272a-8a96-4592-8c32-68c2365cf421', '7299b5ba-439a-494a-9c07-99d46e9d47e3', '細砂糖'),
-('05a2272a-8a96-4592-8c32-68c2365cf421', 'e2ff9e41-620b-43cc-a362-8e20cf16c3b8', '33'),
-('05a2272a-8a96-4592-8c32-68c2365cf421', 'c6354d52-738c-4f07-92dc-7e413687b3fd', 'test1');
-
 -- --------------------------------------------------------
 
 --
@@ -80,21 +70,14 @@ INSERT INTO `bakery_ingredients` (`FBakeryIngredientId`, `FBakeryMaterialId`, `F
 CREATE TABLE `bakery_item` (
   `FBakeryItemId` varchar(36) NOT NULL,
   `FBakeryItemName` varchar(30) NOT NULL,
+  `FBakeryItemUrl` varchar(350) NOT NULL,
   `FUnitPrice` int(100) NOT NULL,
   `FStorageCount` int(100) NOT NULL,
   `FStorageDays` int(100) NOT NULL,
   `FStorageMethod` varchar(300) NOT NULL,
-  `FBakeryIngredientId` varchar(36) NOT NULL
+  `FBakeryIngredientId` varchar(36) NOT NULL,
+  `FUpdateTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- 傾印資料表的資料 `bakery_item`
---
-
-INSERT INTO `bakery_item` (`FBakeryItemId`, `FBakeryItemName`, `FUnitPrice`, `FStorageCount`, `FStorageDays`, `FStorageMethod`, `FBakeryIngredientId`) VALUES
-('29a1fc2e-815d-4440-b449-33c6f58ea5da', '111', 111, 10, 11, '11', 'd9d58f47-b562-43c1-b0e5-37c4e3cd62d0'),
-('d70fe723-1432-4651-a106-6f070994aac1', '444', 4, 10, 44, '44', '47913586-a805-48bb-bc85-63d6810da3eb'),
-('03ff4567-a03d-4721-bc53-265bc0dcf741', '55', 55, 10, 55, '12小時內未食用完必須冰冷藏', '05a2272a-8a96-4592-8c32-68c2365cf421');
 
 -- --------------------------------------------------------
 
@@ -117,8 +100,9 @@ INSERT INTO `bakery_material` (`FBakeryMaterialId`, `FBakeryMaterialName`) VALUE
 ('a973149c-6194-45e1-a90e-8084c097c3a3', '低筋麵粉'),
 ('e4dfea9d-c025-4143-b2a6-2e3610dc7d50', '無鹽奶油'),
 ('4fa755ee-40cd-456e-a6cd-1b11b842bc0e', '鮮奶'),
-('e2ff9e41-620b-43cc-a362-8e20cf16c3b8', '33'),
-('c6354d52-738c-4f07-92dc-7e413687b3fd', 'test1');
+('72f3626c-e608-406d-90c3-aca16ace81b4', '果醬爺爺'),
+('d0500705-8f31-472e-84ca-68a382e5bdcf', '奶油妹妹'),
+('21d239b7-bdb7-4556-b8ae-a161a7e13ee9', 'tewst');
 
 -- --------------------------------------------------------
 
@@ -128,26 +112,12 @@ INSERT INTO `bakery_material` (`FBakeryMaterialId`, `FBakeryMaterialName`) VALUE
 
 CREATE TABLE `bakery_order` (
   `FOrderId` varchar(36) NOT NULL,
+  `FOrderNumber` varchar(20) NOT NULL,
   `FUserId` varchar(36) NOT NULL,
+  `FOrderStatusId` varchar(36) NOT NULL,
   `FTotalPrice` int(100) NOT NULL,
   `FCreateDate` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- 傾印資料表的資料 `bakery_order`
---
-
-INSERT INTO `bakery_order` (`FOrderId`, `FUserId`, `FTotalPrice`, `FCreateDate`) VALUES
-('e514aa92-a18e-44df-99da-c952262cf228', '19451217-1dd2-11b2-8000-080027b246c3', 541, '2021-11-10 11:40:59.156728'),
-('27855af3-7a5e-42c1-b9a9-d2f1075dd144', '19451217-1dd2-11b2-8000-080027b246c3', 721, '2021-11-10 11:48:13.256836'),
-('d983fc6c-a3bd-4cf6-91a5-6f71ad9769ec', '19451217-1dd2-11b2-8000-080027b246c3', 1, '2021-11-10 11:50:09.818422'),
-('21b1ace4-95d5-4c4a-b09b-c463d7d8c6f9', '19451217-1dd2-11b2-8000-080027b246c3', 630, '2021-11-10 11:50:40.252173'),
-('77231861-c05c-4f2d-91f8-412193e0c78f', '19451217-1dd2-11b2-8000-080027b246c3', 4, '2021-11-11 15:22:29.585535'),
-('12e1126f-16e1-4ba4-b72c-425b910964b3', '19451217-1dd2-11b2-8000-080027b246c3', 4, '2021-11-11 15:22:51.054141'),
-('3c17c517-a2ad-4e5d-88bd-ae19b6ede172', '19451217-1dd2-11b2-8000-080027b246c3', 4, '2021-11-11 15:22:59.981138'),
-('a49954b6-d85b-42e1-afc6-38cbf77efc79', '19451217-1dd2-11b2-8000-080027b246c3', 4, '2021-11-11 15:23:03.181458'),
-('0473d26e-b793-40fd-8236-8a0e0ce195a2', '19451217-1dd2-11b2-8000-080027b246c3', 4, '2021-11-11 15:23:41.750266'),
-('703cd09b-7bbd-4f10-af17-96f77edb30e2', '19451217-1dd2-11b2-8000-080027b246c3', 110, '2021-11-11 17:46:16.354089');
 
 -- --------------------------------------------------------
 
@@ -159,24 +129,35 @@ CREATE TABLE `bakery_order_detail` (
   `FOrderDetailId` varchar(36) NOT NULL,
   `FOrderId` varchar(36) NOT NULL,
   `FBakeryItemId` varchar(36) NOT NULL,
-  `FName` varchar(20) NOT NULL,
+  `FBakeryItemName` varchar(20) NOT NULL,
   `FCount` int(10) NOT NULL,
   `FUnitPrice` int(10) NOT NULL,
   `FTotalPrice` int(10) NOT NULL,
   `FCreateTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- 傾印資料表的資料 `bakery_order_detail`
+-- 資料表結構 `bakery_order_status`
 --
 
-INSERT INTO `bakery_order_detail` (`FOrderDetailId`, `FOrderId`, `FBakeryItemId`, `FName`, `FCount`, `FUnitPrice`, `FTotalPrice`, `FCreateTime`) VALUES
-('1c7c94c2-0003-41cd-a731-f64970352742', 'e514aa92-a18e-44df-99da-c952262cf228', '13af2503-37f1-4c79-845d-3a7f95b30b73', '吐司', 6, 90, 540, '2021-11-10 11:40:59.172686'),
-('541a7c1d-1558-4d2b-bdc3-3a0bc9947088', 'e514aa92-a18e-44df-99da-c952262cf228', '361fa9ca-bdcb-4bcb-91cf-f48952d0b8ec', 'asd', 1, 1, 1, '2021-11-10 11:40:59.172686'),
-('fd674ea0-41f3-4d7c-84b2-7ce436a2a584', '27855af3-7a5e-42c1-b9a9-d2f1075dd144', '361fa9ca-bdcb-4bcb-91cf-f48952d0b8ec', 'asd', 1, 1, 1, '2021-11-10 11:48:13.262265'),
-('ede6e42e-d63a-45c3-8058-fb64a3f37209', '27855af3-7a5e-42c1-b9a9-d2f1075dd144', '13af2503-37f1-4c79-845d-3a7f95b30b73', '吐司', 8, 90, 720, '2021-11-10 11:48:13.262265'),
-('03b90901-a683-446b-ad82-147fac6424ec', 'd983fc6c-a3bd-4cf6-91a5-6f71ad9769ec', 'c89f69f2-2e21-40ab-bdc8-182ae54d0c59', '麵包一', 1, 1, 1, '2021-11-10 11:50:09.821673'),
-('d3166be7-13b0-4466-98c8-2cd9a75267e6', '21b1ace4-95d5-4c4a-b09b-c463d7d8c6f9', '13af2503-37f1-4c79-845d-3a7f95b30b73', '吐司', 7, 90, 630, '2021-11-10 11:50:40.256922');
+CREATE TABLE `bakery_order_status` (
+  `FOrderStatusId` varchar(36) NOT NULL,
+  `FOrderStatusName` varchar(10) NOT NULL,
+  `FOrder` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `bakery_order_status`
+--
+
+INSERT INTO `bakery_order_status` (`FOrderStatusId`, `FOrderStatusName`, `FOrder`) VALUES
+('aeff66f8-90df-43f4-874f-6192561ec115', '備料中', 2),
+('f8f46d96-a98b-4113-9cb0-88ff32e81dc1', '製作中', 3),
+('8c2101d9-5934-4e80-bae2-37053d04fe76', '待出貨', 4),
+('7df08db2-91f1-41ec-8f86-60bcb7a3564e', '等待確認訂單', 1),
+('778248e2-d5f3-4927-84c5-43184e6acc3c', '已完成', 5);
 
 -- --------------------------------------------------------
 
@@ -195,11 +176,12 @@ CREATE TABLE `list` (
 --
 
 INSERT INTO `list` (`FListId`, `FListName`, `FListKey`) VALUES
-('026eebc2-e025-4390-958c-78e86f0516a0', '麵包坊', 'Bakery'),
+('026eebc2-e025-4390-958c-78e86f0516a0', '烘焙坊', 'Bakery'),
 ('63d3834a-9814-45e2-8995-a11512bbc608', '儀錶板', 'Dashboard'),
-('fb3ae05d-030b-4ba0-8dc6-9e0f65808bc6', '麵包坊管理平台', 'Bakery Manage'),
+('fb3ae05d-030b-4ba0-8dc6-9e0f65808bc6', '烘焙坊商品管理', 'Bakery Manage'),
 ('ac03a4ab-8432-402a-8bde-449a2e276303', '工具區', 'Tools'),
-('c2f3dafe-46bf-4a72-9f7c-d3eac8120e41', '資料庫管理', 'Database');
+('c2f3dafe-46bf-4a72-9f7c-d3eac8120e41', '資料庫管理', 'Database'),
+('bd6495a3-9bc5-4cbf-b936-b08e1c0a3263', '烘焙坊訂單管理', 'Bakery Order');
 
 -- --------------------------------------------------------
 
