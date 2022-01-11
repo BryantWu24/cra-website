@@ -13,12 +13,11 @@ import {
     DialogActions,
     Button,
     Divider,
-    SpeedDialAction,
     SpeedDial,
     IconButton
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SettingsIcon from '@mui/icons-material/Settings';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -35,9 +34,6 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Pageheader from '../../components/PageHeader';
 
-const actions = [
-    { icon: <ShoppingCartIcon />, name: '購物清單' },
-];
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -254,7 +250,12 @@ export default class Bakery extends Component {
             console.log(res)
             const data = JSON.parse(JSON.stringify(res.data.data))
             if (res.data.code === 20000) {
-                this.setState({ data })
+                console.log(data);
+                const finalData = [];
+                data.forEach((item) => {
+                    if (item.FStorageCount !== 0) finalData.push(item);
+                })
+                this.setState({ data: finalData })
             }
         })
     }
@@ -357,7 +358,9 @@ export default class Bakery extends Component {
                             this.state.data.map((item, idx) => {
                                 return (<Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
                             })
-                            : <div></div>
+                            :
+                            <Grid style={{ display: 'flex', justifyContent: "center"}} item xs={12}   >不好意思，目前尚無商品開放購買</Grid>
+
                     }
                 </Grid>
                 {/* 購物 Dialog */}
@@ -470,16 +473,10 @@ export default class Bakery extends Component {
                 <SpeedDial
                     ariaLabel="購物"
                     sx={{ position: 'absolute', bottom: 16, right: 16 }}
-                    icon={<SettingsIcon />}
+                    icon={<ShoppingCartIcon />}
+                    onClick={this.openOrderListDialog}
+                    name="購物車"
                 >
-                    {actions.map((action) => (
-                        <SpeedDialAction
-                            key={action.name}
-                            icon={action.icon}
-                            tooltipTitle={action.name}
-                            onClick={this.openOrderListDialog}
-                        />
-                    ))}
                 </SpeedDial>
             </div >
         )

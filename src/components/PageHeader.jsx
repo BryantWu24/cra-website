@@ -1,11 +1,6 @@
-import { textAlign } from '@mui/system';
 import React, { Component } from 'react';
 
 class Pageheader extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { title } = this.props
         return (
