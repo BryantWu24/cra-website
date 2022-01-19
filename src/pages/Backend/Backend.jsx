@@ -662,10 +662,8 @@ class Backend extends Component {
                 </div>
                 {/* 註冊 Dialog */}
                 <Dialog open={this.state.isSignUpDialogOpen} disableEscapeKeyDown id="sign-up-dialog">
-                    <DialogTitle style={{ background: '#EBEBEB', color: '#1976d2', fontWeight: 'bold', textAlign: 'center', fontSize: '2rem', fontFamily: '標楷體' }} >會員註冊</DialogTitle>
-                    <DialogContent style={{ background: '#EBEBEB', color: '#1976d2' }} >
-                        {/* <DialogContentText style={{ background: '#EBEBEB', color: 'white' }} >
-                        </DialogContentText> */}
+                    <DialogTitle className="DialogTitle"  >會員註冊</DialogTitle>
+                    <DialogContent  >
                         <TextField
                             autoFocus
                             margin="dense"
@@ -679,15 +677,14 @@ class Backend extends Component {
                             helperText={this.state.signInfo.err_name}
                             error={(this.state.signInfo?.err_name?.length > 0 && !!this.state.isSignUpClicked)}
                         />
-                        <FormControl component="fieldset" style={{ marginTop: '1rem', color: '#1976d2' }}>
-                            <FormLabel component="legend"
-                            >性別</FormLabel>
+                        <FormControl component="fieldset" className='DialogTextColor' style={{ marginTop: '1rem' }}>
+                            <FormLabel component="legend" className="DialogTextColor">性別</FormLabel>
                             <RadioGroup row aria-label="gender" name="row-radio-buttons-group"
                                 onChange={this.handleSignGender}
                                 value={this.state.signInfo.gender}>
-                                <FormControlLabel style={{ color: '#1976d2' }} value="male" control={<Radio
+                                <FormControlLabel value="male" control={<Radio
                                 />} label="男" />
-                                <FormControlLabel style={{ color: '#1976d2' }} value="female" control={<Radio
+                                <FormControlLabel value="female" control={<Radio
                                 />} label="女" />
                             </RadioGroup>
                         </FormControl>
@@ -751,8 +748,8 @@ class Backend extends Component {
                             <ReportProblemIcon />  <label style={{ paddingLeft: '5px' }}>部分授權功能需通過審核才能使用，請聯繫授權人員</label>
                         </div> */}
                     </DialogContent>
-                    <DialogActions style={{ background: '#EBEBEB' }} >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: "#1976d2", alignItems: 'center', width: '100%' }}>
+                    <DialogActions>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <div>
                                 <Button onClick={() => { this.showDialog('logIn') }} >我要登入</Button>
                             </div>
@@ -765,11 +762,8 @@ class Backend extends Component {
                 </Dialog>
                 {/* 登入 Dialog */}
                 <Dialog open={this.state.isLogInDialogOpen} disableEscapeKeyDown id="log-in-dialog">
-                    <DialogTitle style={{ background: '#EBEBEB', color: '#1976d2', textAlign: 'center', fontWeight: 'bold', fontSize: '2rem', fontFamily: '標楷體' }} >會員登入</DialogTitle>
-                    <DialogContent style={{ background: '#EBEBEB', color: '#1976d2' }} >
-                        {/* <DialogContentText style={{ background: '#EBEBEB', color: 'white' }} >
-                            登入
-                        </DialogContentText> */}
+                    <DialogTitle className="DialogTitle" >會員登入</DialogTitle>
+                    <DialogContent  >
                         <TextField
                             autoFocus
                             margin="dense"
@@ -796,8 +790,8 @@ class Backend extends Component {
                             error={(this.state.loginInfo?.err_password?.length > 0 && !!this.state.isLoginClicked)}
                         />
                     </DialogContent>
-                    <DialogActions style={{ background: '#EBEBEB' }} >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#1976d2', alignItems: 'center', width: '100%' }}>
+                    <DialogActions  >
+                        <div style={{ display: 'flex', color: 'red', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <div>
                                 <Button onClick={() => { this.showDialog('signUp') }} >我要註冊</Button>
                             </div>
@@ -810,15 +804,15 @@ class Backend extends Component {
                 </Dialog>
                 {/* 確認登出 Dialog */}
                 <Dialog open={this.state.isLogOutDialogOpen} disableEscapeKeyDown id="log-out-dialog" >
-                    <DialogTitle class="dialog-title-text">登出</DialogTitle>
-                    <DialogContent class="bgColor">
-                        <DialogContentText class="dialog-content-text" >
+                    <DialogTitle className="DialogTitle" >登出</DialogTitle>
+                    <DialogContent >
+                        <DialogContentText >
                             請問確定要登出了嗎?
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => { this.closeDialog('logOut') }} class="dialog-action-text" >取消</Button>
-                        <Button onClick={this.doLogOut} class="dialog-action-text">登出</Button>
+                        <Button onClick={() => { this.closeDialog('logOut') }} >取消</Button>
+                        <Button onClick={this.doLogOut} >登出</Button>
                     </DialogActions>
                 </Dialog>
             </div >
