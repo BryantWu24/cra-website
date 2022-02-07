@@ -15,6 +15,7 @@ import MuiAlert from '@mui/material/Alert';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import { Config } from '../../core/config';
+import '../../style/BakerySheet.css';
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -520,8 +521,8 @@ class BakerySheet extends Component {
                 </Grid >
                 {/* 新增成分 Dialog */}
                 <Dialog open={this.state.isShowAddMaterialDialog} disableEscapeKeyDown id="add-material-dialog">
-                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >新增成分</DialogTitle>
-                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                    <DialogTitle className="DialogTitle">新增成分</DialogTitle>
+                    <DialogContent>
                         <TextField
                             autoFocus
                             margin="dense"
@@ -529,20 +530,19 @@ class BakerySheet extends Component {
                             label="成分名稱"
                             type="text"
                             fullWidth
-                            variant="standard"
-                            color="secondary"
+                            variant="outlined"
                             onChange={this.handleAddMaterialChange}
                             value={this.state.addMaterialInfo.name}
                             helperText={this.state.addMaterialInfo.err_name}
                             error={(this.state.addMaterialInfo?.err_name?.length > 0 && !!this.state.isAddMaterialClicked)}
                         />
+
                     </DialogContent>
-                    <DialogActions style={{ background: '#959595' }} >
+                    <DialogActions  >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <div>
                                 <Button color="secondary" onClick={() => { this.switchAddMaterialDialog(false) }} >取消</Button>
                             </div>
-
                             <div>
                                 <Button color="secondary" onClick={this.doAddMaterial} >建立</Button>
                             </div>

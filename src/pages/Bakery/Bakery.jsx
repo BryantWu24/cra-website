@@ -33,7 +33,7 @@ import { Config } from '../../core/config';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Pageheader from '../../components/PageHeader';
-
+import '../../style/Bakery.css';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -359,20 +359,20 @@ export default class Bakery extends Component {
                                 return (<Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
                             })
                             :
-                            <Grid style={{ display: 'flex', justifyContent: "center"}} item xs={12}   >不好意思，目前尚無商品開放購買</Grid>
+                            <Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12}   >不好意思，目前尚無商品開放購買</Grid>
 
                     }
                 </Grid>
-                {/* 購物 Dialog */}
+                {/* 加入購物 Dialog */}
                 <Dialog open={this.state.isCartDialogOpen} disableEscapeKeyDown id="cart-dialog" >
-                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >{this.state.currentProductInfo.FBakeryItemName}</DialogTitle>
-                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                    <DialogTitle className="DialogTitle" >{this.state.currentProductInfo.FBakeryItemName}</DialogTitle>
+                    <DialogContent>
                         {
                             (this.state.currentProductInfo.FStorageCount === 0)
                                 ?
                                 <div></div>
                                 :
-                                <div style={{ background: '#959595', color: 'white', marginBottom: '1rem' }} >
+                                <div style={{ marginBottom: '1rem' }} >
                                     單價：$ {this.state.currentProductInfo.FUnitPrice}  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 總金額： {this.state.currentProductInfo.FUnitPrice * this.state.count} 元
                                 </div>
                         }
@@ -380,7 +380,7 @@ export default class Bakery extends Component {
                             {this.setSelectCountOption()}
                         </div>
                     </DialogContent>
-                    <DialogActions style={{ background: '#959595' }} >
+                    <DialogActions  >
                         <Button color="secondary" onClick={() => { this.closeDialog('cart') }}>取消</Button>
                         {
                             (this.state.currentProductInfo.FStorageCount === 0)
@@ -393,8 +393,8 @@ export default class Bakery extends Component {
                 </Dialog>
                 {/* 購物清單 Dialog */}
                 <Dialog open={this.state.isOrderListDialogOpen} disableEscapeKeyDown id="order-list-dialog" >
-                    <DialogTitle style={{ background: '#959595', color: 'white', fontWeight: 'bold', fontSize: '1.5rem' }} >購物清單</DialogTitle>
-                    <DialogContent style={{ background: '#959595', color: 'white' }} >
+                    <DialogTitle className="DialogTitle" >購物清單</DialogTitle>
+                    <DialogContent >
                         {
                             (this.state.orderList.length > 0)
                                 ?
@@ -449,7 +449,7 @@ export default class Bakery extends Component {
                                 </div>
                         }
                     </DialogContent>
-                    <DialogActions style={{ background: '#959595' }} >
+                    <DialogActions  >
                         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                             <div style={{ marginLeft: '0.5rem' }}>
                                 {(this.state.orderList.length > 0)

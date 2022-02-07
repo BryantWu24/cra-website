@@ -1,0 +1,84 @@
+/* Dialog */
+.MuiPaper-root.MuiDialog-paper {
+  color: white;
+  background: #8360c3; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to bottom right,
+    #45d4a7,
+    #8360c3
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to bottom right,
+    #45d4a7,
+    #8360c3
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* 購物車頁面 - 按鈕 */
+#order-list-dialog .MuiButton-root.MuiButton-text {
+  border: solid 0.5px #fff;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  font-family: "微軟正黑體";
+  cursor: pointer;
+  margin: 0.3rem;
+}
+
+/* 加入購物車頁面 - 按鈕 */
+#cart-dialog .MuiButton-root.MuiButton-text {
+  border: solid 0.5px #fff;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  font-family: "微軟正黑體";
+  cursor: pointer;
+  margin: 0.3rem;
+}
+
+/* 輸入框 Foucs */
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border: #45d4a7 solid 2px !important;
+}
+
+/* 輸入框 尚未 Foucs */
+.MuiOutlinedInput-notchedOutline {
+  border: #8360c3 solid 2px !important;
+  border-radius: 10px;
+}
+/* 輸入框 Label */
+.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-outlined {
+  color: #8360c3;
+  font-weight: bold;
+}
+
+/* 輸入框文字 */
+.MuiOutlinedInput-root.MuiInputBase-root {
+  color: #8360c3;
+  background: whitesmoke;
+}
+
+/* 欄位錯誤提示字 */
+.MuiFormHelperText-root.MuiFormHelperText-contained {
+  color: red;
+  margin-left: 0.5rem;
+}
+
+.DialogTitle {
+  text-align: center !important;
+  font-weight: bold !important;
+  font-size: 2rem !important;
+  font-family: "微軟正黑體" !important;
+}
+
+.DialogTextColor {
+  color: #8360c3 !important;
+  font-weight: bold !important;
+}
+
+/* DialogContentText */
+.MuiDialogContentText-root.MuiTypography-root {
+  color: red;
+  font-size: 1.3rem;
+  font-weight: bold;
+}

@@ -45,7 +45,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { Config } from '../../core/config'
 
-import './Backend.css';
+import '../../style/Backend.css'
 
 const styles = (theme) => ({
     root: {

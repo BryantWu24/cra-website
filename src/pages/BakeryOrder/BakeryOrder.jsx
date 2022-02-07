@@ -6,6 +6,13 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    TableContainer,
+    TableCell,
+    TableBody,
+    TableRow,
+    TableHead,
+    Table,
+    Paper,
 } from '@mui/material';
 import { withStyles } from '@material-ui/styles';
 import Snackbar from '@mui/material/Snackbar';
@@ -14,6 +21,9 @@ import axios from 'axios';
 import { Config } from '../../core/config'
 import Pageheader from '../../components/PageHeader';
 import { DataGrid } from '@mui/x-data-grid';
+
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import '../../style/BakeryOrder.css';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -35,7 +45,8 @@ class BakeryOrder extends Component {
             orderStatus: [],
             currentStatus: {},
             nextStatus: {},
-            selectedData: []
+            selectedData: [],
+            clickData: null
         }
     }
 
@@ -84,7 +95,6 @@ class BakeryOrder extends Component {
             .post(Config.apiUrl + "/bakery/order/update", request)
             .then((res) => {
                 if (!!res.data) {
-                    console.log('bakery item update :', res.data);
                     switch (res.data.code.toString()) {
                         case '20000':
                             this.showSnackbar('success', res.data.message);
@@ -104,12 +114,9 @@ class BakeryOrder extends Component {
 
     getOrderList = async () => {
         await axios.post(Config.apiUrl + '/openapi/bakery/order/list').then((res) => {
-            console.log('getOrderList:', res);
-
             const data = res.data.data;
             const tableData = []
             data.forEach((item, index) => {
-                console.log()
                 tableData.push({
                     FOrderNumber: item.FOrderNumber,
                     FUserName: item.FUserName,
@@ -132,7 +139,6 @@ class BakeryOrder extends Component {
     }
     getOrderStatus = async () => {
         await axios.post(Config.apiUrl + '/bakery/order/status/list').then((res) => {
-            console.log('OrderStatus:', res);
             const data = res.data.data;
             this.setState({
                 orderStatus: data
@@ -143,7 +149,6 @@ class BakeryOrder extends Component {
     getOrderDetail = async (id) => {
         const body = { id }
         await axios.post(Config.apiUrl + '/openapi/bakery/getSpecifyOrderDetail', body).then((res) => {
-            console.log('OrderDetail:', res);
             if (!!res.data) {
                 switch (res.data.code.toString()) {
                     case '20000':
@@ -161,7 +166,13 @@ class BakeryOrder extends Component {
 
     // handle 點擊列
     handleRowClick = (item) => {
-        console.log(item);
+        this.setState({
+            clickData: item
+        });
+    }
+
+    // 顯示訂單明細
+    showDetail = (item) => {
         this.getOrderDetail(item.row.FOrderId);
         const FOrder = item.row.FOrder;
         let nextStatus = {};
@@ -173,13 +184,18 @@ class BakeryOrder extends Component {
             if (status.FOrder === FOrder + 1) nextStatus = status
         })
 
-
         this.setState({
             isStatusDialogOpen: true,
             currentStatus,
             nextStatus,
             currentOrderNumber: item.row.FOrderNumber
         })
+    }
+
+    doShowDetailBtn() {
+        const data = this.state.clickData;
+        if (!!data) this.showDetail(data);
+        else this.showSnackbar('error', '請選擇一筆訂單');
     }
 
     switchStatusDialog = (isOpen) => {
@@ -218,8 +234,18 @@ class BakeryOrder extends Component {
                         {this.state.snackbarMsg}
                     </Alert>
                 </Snackbar>
-                <Grid item xs={12}>
+                <Grid item xs={0} md={3} ></Grid>
+                <Grid item xs={12} md={6}>
                     <Pageheader title='烘焙坊訂單管理系統'></Pageheader>
+                </Grid>
+                <Grid item xs={12} md={3} >
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50px' }}>
+                        <div>
+                            <Button variant="outlined" startIcon={<ListAltIcon />} onClick={() => { this.doShowDetailBtn() }}>
+                                查看明細
+                            </Button>
+                        </div>
+                    </div>
                 </Grid>
                 <Grid item xs={12} sm={12} md={12} lg={12} style={{ display: 'flex', justifyContent: 'center' }}>
                     <div style={{ height: 680, width: '800px' }}>
@@ -229,13 +255,14 @@ class BakeryOrder extends Component {
                             alignItems='center'
                             pageSize={10}
                             rowsPerPageOptions={[10]}
-                            onCellDoubleClick={this.handleRowClick}
+                            onCellDoubleClick={this.showDetail}
+                            onCellClick={this.handleRowClick}
                         />
                     </div>
                 </Grid>
                 {/* 狀態 Dialog */}
                 <Dialog open={this.state.isStatusDialogOpen} disableEscapeKeyDown id="status-dialog" >
-                    <DialogTitle style={{ display: 'flex', justifyContent: 'center', alignItems: 'start', fontSize: '1.5rem', fontWeight: 'bold' }} >
+                    <DialogTitle className="DialogTitle" >
                         訂單明細
                     </DialogTitle>
                     <DialogContent  >
@@ -243,32 +270,44 @@ class BakeryOrder extends Component {
                             {
                                 this.state.selectedData.length > 0
                                     ?
-                                    <table style={{ border: '1px solid black' }}>
-                                        <thead>
-                                            <tr>
-                                                <th style={{ border: 'solid 1px black' }}>商品名稱</th>
-                                                <th style={{ border: 'solid 1px black' }}>單價</th>
-                                                <th style={{ border: 'solid 1px black' }}>數量</th>
-                                                <th style={{ border: 'solid 1px black' }}>單項合計</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                this.state.selectedData.map((item) => {
-                                                    return (
-                                                        <tr>
-                                                            <td style={{ border: 'solid 1px black' }}>{item.FBakeryItemName}</td>
-                                                            <td style={{ border: 'solid 1px black' }}>{item.FUnitPrice}</td>
-                                                            <td style={{ border: 'solid 1px black' }}>{item.FCount}</td>
-                                                            <td style={{ border: 'solid 1px black' }}>{item.FOrderDetailTotalPrice}</td>
-                                                        </tr>)
-                                                })
-                                            }
-                                            <tr>
-                                                <td colSpan='4' style={{ border: 'solid 1px black', textAlign: 'end' }}>  總計： {this.state.selectedData[0].FOrderTotalPrice}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div>
+                                        <TableContainer component={Paper}>
+                                            <Table sx={{ minWidth: '100%' }} size="small" aria-label="simple table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>商品名稱</TableCell>
+                                                        <TableCell align="center">單價</TableCell>
+                                                        <TableCell align="center">數量</TableCell>
+                                                        <TableCell align="center">單項合計</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {this.state.selectedData.map((item, idx) => (
+                                                        <TableRow
+                                                            key={idx}
+                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                        >
+                                                            <TableCell component="th" scope="row">
+                                                                {item.FBakeryItemName}
+                                                            </TableCell>
+                                                            <TableCell align="center">{item.FUnitPrice}</TableCell>
+                                                            <TableCell align="center">{item.FCount}</TableCell>
+                                                            <TableCell align="center">{item.FOrderDetailTotalPrice}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                    <TableRow
+                                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                    >
+                                                        <TableCell align="left">總計： </TableCell>
+                                                        <TableCell align="center"></TableCell>
+                                                        <TableCell align="center"></TableCell>
+                                                        <TableCell align="center">
+                                                            {this.state.selectedData[0].FOrderTotalPrice}</TableCell>
+                                                    </TableRow>
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </div>
                                     :
                                     <div> 查無此明細 </div>
                             }
