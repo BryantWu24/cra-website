@@ -62,6 +62,7 @@ const styles = (theme) => ({
         height: '100vh',
         overflow: 'auto',
         width: '100%',
+        background:'lightgray'
     },
     userInfoDiv: {
         padding: '10px',
@@ -376,6 +377,7 @@ class Backend extends Component {
                                 profile.id = data.FUserId;
                                 profile.list = data.list;
                                 profile.isLogin = true;
+                                profile.auth = data.FRoleName;
                                 result.profile = profile;
                                 result.isLogInDialogOpen = false;
                                 localStorage.setItem('profile', JSON.stringify(profile));
@@ -617,7 +619,7 @@ class Backend extends Component {
                                 <MenuIcon />
                             </IconButton>
                             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                                News
+                                烘焙坊
                             </Typography>
                             {
                                 (this.state.profile?.isLogin)

@@ -353,7 +353,6 @@ class BakerySheet extends Component {
         if (this.state?.uploadFile !== null) {
             const data = new FormData()
             data.append('imgFile', this.state.uploadFile)
-
             return await axios.post(Config.apiUrl + "/api/upload", data)
                 .then(res => {
                     console.log(res)

@@ -54,11 +54,11 @@ class BakeryCard extends Component {
                         }
                     />
                     {
-                        (!!this.props.data.productImgUrl) ?
+                        (!!this.props.data.FBakeryItemUrl) ?
                             <CardMedia
                                 component="img"
                                 height="200"
-                                image={this.props.data.productImgUrl}
+                                image={this.props.data.FBakeryItemUrl}
                                 alt="Picture"
                                 onLoad={this.handleImgOnLoad}
                                 onError={this.handleImgOnLoad}

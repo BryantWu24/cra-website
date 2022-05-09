@@ -356,7 +356,7 @@ export default class Bakery extends Component {
                         !!this.state.data && this.state.data.length > 0
                             ?
                             this.state.data.map((item, idx) => {
-                                return (<Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12} sm={6} md={3} lg={2} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
+                                return (<Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12} sm={6} md={3} lg={3} key={idx} ><BakeryCard data={item} productInfo={this.handleProductInfo} /></Grid>)
                             })
                             :
                             <Grid style={{ display: 'flex', justifyContent: "center" }} item xs={12}   >不好意思，目前尚無商品開放購買</Grid>
