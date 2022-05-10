@@ -317,7 +317,7 @@ class BakeryOrder extends Component {
                                 ?
                                 <div></div>
                                 :
-                                <div >目前訂單狀態為<span style={{ color: 'red', fontSize: '1rem', fontWeight: 'bold' }}>{this.state?.currentStatus?.FOrderStatusName}</span>，是否要將狀態更新至<span style={{ color: 'red', fontSize: '1rem', fontWeight: 'bold' }}>{this.state?.nextStatus?.FOrderStatusName}</span></div>
+                                <div >目前訂單狀態為<span style={{ color: '#DCDC8B', fontSize: '1.2rem', fontWeight: 'bold' }}>{this.state?.currentStatus?.FOrderStatusName}</span>，是否要將狀態更新至<span style={{color: '#DCDC8B', fontSize: '1.2rem', fontWeight: 'bold' }}>{this.state?.nextStatus?.FOrderStatusName}</span></div>
                         }
                     </DialogContent>
                     <DialogActions>

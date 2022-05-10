@@ -1,17 +1,20 @@
 /* Dialog */
 .MuiPaper-root.MuiDialog-paper {
   color: white;
-  background: #8360c3; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
+  background:#1976D2 ; 
+  /* fallback for old browsers */
+  /* background: -webkit-linear-gradient(
     to bottom right,
     #45d4a7,
     #8360c3
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
+  );  */
+  /* Chrome 10-25, Safari 5.1-6 */
+  /* background: linear-gradient(
     to bottom right,
     #45d4a7,
     #8360c3
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  ); */
+   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 /* 購物車頁面 - 按鈕 */
@@ -38,23 +41,23 @@
 
 /* 輸入框 Foucs */
 .Mui-focused .MuiOutlinedInput-notchedOutline {
-  border: #45d4a7 solid 2px !important;
+  /* border: #45d4a7 solid 2px !important; */
 }
 
 /* 輸入框 尚未 Foucs */
 .MuiOutlinedInput-notchedOutline {
-  border: #8360c3 solid 2px !important;
+  /* border: #8360c3 solid 2px !important; */
   border-radius: 10px;
 }
 /* 輸入框 Label */
 .MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-outlined {
-  color: #8360c3;
+  /* color: #8360c3; */
   font-weight: bold;
 }
 
 /* 輸入框文字 */
 .MuiOutlinedInput-root.MuiInputBase-root {
-  color: #8360c3;
+  /* color: #8360c3; */
   background: whitesmoke;
 }
 
@@ -72,7 +75,7 @@
 }
 
 .DialogTextColor {
-  color: #8360c3 !important;
+  /* color: #8360c3 !important; */
   font-weight: bold !important;
 }
 

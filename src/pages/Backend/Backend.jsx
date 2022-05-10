@@ -62,7 +62,7 @@ const styles = (theme) => ({
         height: '100vh',
         overflow: 'auto',
         width: '100%',
-        background:'lightgray'
+        background:'#F1F1F1'
     },
     userInfoDiv: {
         padding: '10px',
@@ -793,7 +793,7 @@ class Backend extends Component {
                         />
                     </DialogContent>
                     <DialogActions  >
-                        <div style={{ display: 'flex', color: 'red', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        <div style={{ display: 'flex', color: '#DCDC8B', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <div>
                                 <Button onClick={() => { this.showDialog('signUp') }} >我要註冊</Button>
                             </div>
